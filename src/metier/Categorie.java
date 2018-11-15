@@ -1,15 +1,19 @@
+package metier;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Categorie {
-	private String nom;
-	private String description;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
+public class Categorie {
+    private StringProperty nom;
+    private StringProperty description;
+    
 	public Categorie(String nom, String description) {
-		super();
-		this.nom = nom;
-		this.description = description;
+		this.nom = new SimpleStringProperty(nom);
+		this.description = new SimpleStringProperty(description);
 	}
 	
 	
@@ -29,20 +33,20 @@ public class Categorie {
 			}
 		}
 	}
-	
-	public String getNom() {
-		return nom;
-	}
 
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public String getNom() {
+        return nom.get();
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public StringProperty nomProperty() {
+        return nom;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description.get();
+    }
+
+    public StringProperty descriptionProperty() {
+        return description;
+    }
 }

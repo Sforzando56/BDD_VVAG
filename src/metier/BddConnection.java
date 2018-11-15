@@ -1,8 +1,7 @@
+package metier;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.*;
-
 
 public class BddConnection {
 	private static Connection con;
@@ -22,7 +21,7 @@ public class BddConnection {
     public static void main(String[] args) {
     	BddConnection.getConnection();
     	try {
-			Categorie.create("test2", "test description");
+			Categorie.create("test4", "test description");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
