@@ -9,8 +9,18 @@ import java.sql.*;
 
 public class Requester {
 
+    private static Requester instance;
+
     private boolean intToBool(int a) {
         return a == 1;
+    }
+
+    private static Requester getInstance(){
+        if (instance == null){
+            instance = new Requester();
+        }
+
+        return instance;
     }
 
     public  ObservableList<SalleVente> getSallesVentes() {
