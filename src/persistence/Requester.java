@@ -2,10 +2,7 @@ package persistence;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import metier.Categorie;
-import metier.Produit;
-import metier.SalleVente;
-import metier.Vente;
+import metier.*;
 
 import java.sql.*;
 
@@ -71,5 +68,19 @@ public class Requester {
         }
 
         return ventes;
+    }
+
+    public void upsertUtilisateur(Utilisateur utilisateur) {
+        String upsertUser = "MERGE INTO USER USING dual ON (\"email\" = \"" + utilisateur.getEmail() + "\") " +
+                "WHEN NOT MATCHED THEN INSERT (\"nom\", \"prenom\", \"code_postal\", \"adresse\") VALUES (" + utilisateur.getNom() + ","
+                + utilisateur.getPrenom() + "," + utilisateur.getCodePostal() + "," + utilisateur.getAdresse() + ")";
+        try {
+            Connection dbConnection = BddConnection.getConnection();
+            Statement statement = dbConnection.createStatement();
+
+            statement.executeQuery(upsertUser);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

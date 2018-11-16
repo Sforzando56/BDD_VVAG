@@ -4,24 +4,24 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AjoutVenteController">
-   <children>
-      <Button layoutX="238.0" layoutY="313.0" mnemonicParsing="false" onAction="#onValiderAjout" text="Valider" />
-      <TextField  layoutX="38.0" layoutY="23.0" promptText="Email" />
-      <TextField layoutX="37.0" layoutY="59.0" promptText="Nom produit" />
-      <TextField layoutX="37.0" layoutY="133.0" promptText="Quantité à vendre" />
-      <RadioButton layoutX="44.0" layoutY="191.0" mnemonicParsing="false" text="Enchères montantes" />
-      <RadioButton layoutX="238.0" layoutY="191.0" mnemonicParsing="false" text="Vente révocable" />
-      <RadioButton layoutX="401.0" layoutY="191.0" mnemonicParsing="false" text="Durée limitée" />
-      <DatePicker layoutX="359.0" layoutY="229.0" promptText="Fin si temps limité" />
-      <RadioButton layoutX="60.0" layoutY="233.0" mnemonicParsing="false" text="Enchères libres" />
-      <Button layoutX="102.0" layoutY="313.0" mnemonicParsing="false" text="Annuler" />
-      <TextField layoutX="217.0" layoutY="267.0" promptText="Prix revient" />
-      <TextField layoutX="37.0" layoutY="95.0" promptText="Catégorie produit" />
-      <TextField layoutX="316.0" layoutY="23.0" promptText="Code postal" />
-      <TextField layoutX="316.0" layoutY="133.0" promptText="Votre nom" />
-      <TextField layoutX="316.0" layoutY="95.0" promptText="Votre prénom" />
-      <TextField layoutX="316.0" layoutY="59.0" promptText="Adresse" />
-   </children>
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AjoutVenteController">
+    <children>
+        <Button layoutX="238.0" layoutY="313.0" mnemonicParsing="false" onAction="#onValiderAjout" text="Valider" />
+        <TextField fx:id="emailTextfield" layoutX="38.0" layoutY="23.0" promptText="Email" />
+        <TextField fx:id="nomProduitTextfield" layoutX="37.0" layoutY="59.0" promptText="Nom produit" />
+        <TextField fx:id="quantiteTextfield" layoutX="37.0" layoutY="133.0" promptText="Quantité à vendre" />
+        <RadioButton fx:id="montante" layoutX="44.0" layoutY="191.0" mnemonicParsing="false" text="Enchères montantes" />
+        <RadioButton fx:id="revocable" layoutX="238.0" layoutY="191.0" mnemonicParsing="false" text="Vente révocable" />
+        <RadioButton fx:id="dureeLimitee" layoutX="401.0" layoutY="191.0" mnemonicParsing="false" text="Durée limitée" />
+        <DatePicker fx:id="datePicker" layoutX="359.0" layoutY="229.0" promptText="Fin si temps limité" />
+        <RadioButton fx:id="encheresLibres" layoutX="60.0" layoutY="233.0" mnemonicParsing="false" text="Enchères libres" />
+        <Button layoutX="102.0" layoutY="313.0" mnemonicParsing="false" text="Annuler" />
+        <TextField fx:id="prixRevientTextfield" layoutX="304.0" layoutY="267.0" promptText="Prix revient" />
+        <TextField fx:id="categorieTextfield" layoutX="37.0" layoutY="95.0" promptText="Catégorie produit" />
+        <TextField fx:id="codePostalTextfield" layoutX="316.0" layoutY="23.0" promptText="Code postal" />
+        <TextField fx:id="nomTextfield" layoutX="316.0" layoutY="133.0" promptText="Votre nom" />
+        <TextField fx:id="prenomTextfield" layoutX="316.0" layoutY="95.0" promptText="Votre prénom" />
+        <TextField fx:id="addressTextfield" layoutX="316.0" layoutY="59.0" promptText="Adresse" />
+      <TextField layoutX="32.0" layoutY="267.0" promptText="Prix depart" fx:id="prixDepartTextfield"/>
+    </children>
 </AnchorPane>
