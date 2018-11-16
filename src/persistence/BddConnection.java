@@ -1,7 +1,10 @@
-package metier;
+package persistence;
+import metier.Categorie;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class BddConnection {
 	private static Connection con;
@@ -26,4 +29,22 @@ public class BddConnection {
 			e.printStackTrace();
 		}
     }
+
+    public static void closeConnection(Connection dbConnection, Statement statement){
+
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+
+			if (dbConnection != null) {
+				dbConnection.close();
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+
+
+	}
 }

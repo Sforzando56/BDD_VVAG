@@ -1,10 +1,10 @@
 package metier;
 
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.ListProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Vente {
 
@@ -12,11 +12,21 @@ public class Vente {
 
     private FloatProperty prixDepart;
 
+    private FloatProperty prixEnCours;
+
     private Timestamp fin;
 
     private ListProperty<Enchere> encheres;
 
     private Produit produit;
+
+    public Vente(int idVente, float prixDepart, Timestamp fin, Produit produit) {
+        this.idVente = idVente;
+        this.prixDepart = new SimpleFloatProperty(prixDepart);
+        this.fin = fin;
+        this.encheres = new SimpleListProperty<>();
+        this.produit = produit;
+    }
 
     public int getIdVente() {
         return idVente;
@@ -45,4 +55,14 @@ public class Vente {
     public Produit getProduit() {
         return produit;
     }
+
+    public StringProperty nomProduitProperty() {
+        return getProduit().nomProperty();
+    }
+
+    public FloatProperty getPrixEnCours() {
+        return prixEnCours;
+    }
+
+
 }

@@ -1,8 +1,6 @@
 package metier;
 
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class Produit {
 
@@ -13,6 +11,13 @@ public class Produit {
     private FloatProperty prixRevient;
 
     private IntegerProperty stock;
+
+    public Produit(int idProduit, String nom, float prixRevient, int stock) {
+        this.idProduit = idProduit;
+        this.nom = new SimpleStringProperty(nom);
+        this.prixRevient = new SimpleFloatProperty(prixRevient);
+        this.stock = new SimpleIntegerProperty(stock);
+    }
 
     public int getIdProduit() {
         return idProduit;
