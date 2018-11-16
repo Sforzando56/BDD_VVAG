@@ -1,11 +1,5 @@
 package metier;
 
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import java.sql.Timestamp;
 
 public class SalleVente {
 
@@ -17,28 +11,16 @@ public class SalleVente {
 
     private boolean dureeLim;
 
-    private boolean enchreLibre;
+    private boolean enchereLibre;
 
     private Categorie categorie;
-
-    private ListProperty<Vente> ventes;
 
     public SalleVente(int idSalle, boolean montante, boolean revocable, Categorie categorie) {
         this.idSalle = idSalle;
         this.montante = montante;
         this.revocable = revocable;
         this.categorie = categorie;
-        this.ventes = new SimpleListProperty<>();
     }
-
-    public ObservableList<Vente> getVentes() {
-        return ventes.get();
-    }
-
-    public ListProperty<Vente> ventesProperty() {
-        return ventes;
-    }
-
 
     public int getIdSalle() {
         return idSalle;
@@ -50,6 +32,14 @@ public class SalleVente {
 
     public boolean isRevocable() {
         return revocable;
+    }
+
+    public boolean isDureeLim() {
+        return dureeLim;
+    }
+
+    public boolean isEnchereLibre() {
+        return enchereLibre;
     }
 
     public Categorie getCategorie() {

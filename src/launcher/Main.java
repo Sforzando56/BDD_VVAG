@@ -15,7 +15,6 @@ public class Main extends Application {
     public void start(Stage stage) {
         stage.setTitle("Salles de vente");
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/vue/FXMLDocument.fxml"));
-        fxmlLoader.setController(new FXMLDocumentController());
         Parent root;
         try {
             root = fxmlLoader.load();

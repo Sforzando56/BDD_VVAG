@@ -5,16 +5,19 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import metier.Categorie;
 import metier.SalleVente;
 import metier.Vente;
+import persistence.Requester;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -38,12 +41,15 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private TableColumn<Vente, Date> dateColumn;
 
+    private Stage ajoutVenteStage;
+
+    private Requester requester;
+
     public void initialize(URL url, ResourceBundle rb) {
-        Categorie categorie = new Categorie("Mobilier", "Mobilier");
-        Categorie categorie2 = new Categorie("Bijoux", "bijoux");
-        SalleVente salle = new SalleVente(1, true, true, categorie);
-        SalleVente salle2 = new SalleVente(1, true, true, categorie2);
-        salles = FXCollections.observableArrayList(salle, salle2);
+        requester = Requester.getInstance();
+
+        salles = requester.getSallesVentes();
+
         listViewSalles.setItems(salles);
         listViewSalles.setCellFactory(param -> new ListCell<SalleVente>() {
             @Override
@@ -65,9 +71,27 @@ public class FXMLDocumentController implements Initializable {
                 addListener(new ChangeListener<SalleVente>() {
                     @Override
                     public void changed(ObservableValue<? extends SalleVente> observableValue, SalleVente oldSalleVente, SalleVente newSalleVente) {
-                        ventesTables.setItems(newSalleVente.getVentes());
+                        ventesTables.setItems(requester.getVentesBySalle(newSalleVente.getIdSalle()));
                     }
                 });
+    }
+
+    @FXML
+    private void onAjouterVente() {
+        ajoutVenteStage = new Stage();
+        ajoutVenteStage.setTitle("Ajouter une vente");
+        FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutVente.fxml"));
+        Parent root;
+        try {
+            root = fxmloader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        Scene scene = new Scene(root);
+        ajoutVenteStage.setScene(scene);
+
+        ajoutVenteStage.show();
     }
 
 

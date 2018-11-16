@@ -3,7 +3,9 @@ package persistence;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import metier.Categorie;
+import metier.Produit;
 import metier.SalleVente;
+import metier.Vente;
 
 import java.sql.*;
 
@@ -15,25 +17,23 @@ public class Requester {
         return a == 1;
     }
 
-    private static Requester getInstance(){
-        if (instance == null){
+    public static Requester getInstance() {
+        if (instance == null) {
             instance = new Requester();
         }
 
         return instance;
     }
 
-    public  ObservableList<SalleVente> getSallesVentes() {
-        Connection dbConnection = null;
-        Statement statement = null;
+    public ObservableList<SalleVente> getSallesVentes() {
         ObservableList<SalleVente> salles = FXCollections.observableArrayList();
-        ;
+
         String selectSallesSQL = "SELECT ID_SALLE, MONTANTE, DUREE_LIM, REVOCABLE, NOM_CATEGORIE, DESCRIPTION, ENCHERE_LIBRE" +
-                " from Salle s, Categorie c WHERE s.nom_categorie = c.nom;";
+                " from SALLE S, CATEGORIE C WHERE s.nom_categorie = c.nom";
 
         try {
-            dbConnection = BddConnection.getConnection();
-            statement = dbConnection.createStatement();
+            Connection dbConnection = BddConnection.getConnection();
+            Statement statement = dbConnection.createStatement();
 
             ResultSet rs = statement.executeQuery(selectSallesSQL);
             while (rs.next()) {
@@ -44,10 +44,32 @@ public class Requester {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            BddConnection.closeConnection(dbConnection, statement);
         }
 
         return salles;
+    }
+
+    public ObservableList<Vente> getVentesBySalle(int idSalle) {
+        ObservableList<Vente> ventes = FXCollections.observableArrayList();
+
+        String selectSallesSQL = "SELECT ID_VENTE, P.ID_PRODUIT, PRIX_DEP, PRIX_REVIENT, DATE_FIN, STOCK, NOM, NOM_CATEGORIE from VENTE V, PRODUIT P " +
+                "WHERE V.ID_PRODUIT = P.ID_PRODUIT AND V.ID_SALLE = " + Integer.toString(idSalle);
+
+        try {
+            Connection dbConnection = BddConnection.getConnection();
+            Statement statement = dbConnection.createStatement();
+
+            ResultSet rs = statement.executeQuery(selectSallesSQL);
+            while (rs.next()) {
+                Produit produit = new Produit(rs.getInt("id_produit"), rs.getString("nom"), rs.getFloat("prix_revient"), rs.getInt("stock"));
+                ventes.add(
+                        new Vente(rs.getInt("id_vente"), rs.getFloat("prix_dep"), rs.getTimestamp("date_fin"), produit)
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ventes;
     }
 }

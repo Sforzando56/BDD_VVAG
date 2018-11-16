@@ -13,7 +13,7 @@ public class BddConnection {
 		if(con == null) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-				con = DriverManager.getConnection("jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1", "vandaevi", "vandaevi");
+				con = DriverManager.getConnection("jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1", "donnea", "donnea");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -29,22 +29,4 @@ public class BddConnection {
 			e.printStackTrace();
 		}
     }
-
-    public static void closeConnection(Connection dbConnection, Statement statement){
-
-		try {
-			if (statement != null) {
-				statement.close();
-			}
-
-			if (dbConnection != null) {
-				dbConnection.close();
-			}
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-
-
-	}
 }

@@ -3,18 +3,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:controller="controller.FXMLDocumentController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <left>
-        <ListView fx:id="listViewSalles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+        <ListView fx:id="listViewSalles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
     </left>
     <center>
         <TableView fx:id="ventesTables" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="nomProduitColumn" prefWidth="103.0" text="Produit"/>
-                <TableColumn fx:id="prixColumn" prefWidth="170.0" text="Prix En cours"/>
-                <TableColumn fx:id="dateColumn" prefWidth="123.0" text="Fin"/>
+                <TableColumn fx:id="nomProduitColumn" prefWidth="103.0" text="Produit" />
+                <TableColumn fx:id="prixColumn" prefWidth="170.0" text="Prix En cours" />
+                <TableColumn fx:id="dateColumn" prefWidth="123.0" text="Fin" />
             </columns>
         </TableView>
     </center>
+   <bottom>
+      <Button mnemonicParsing="false" onAction="#onAjouterVente" text="Vendre un produit" textAlignment="CENTER" BorderPane.alignment="BOTTOM_LEFT" />
+   </bottom>
 </BorderPane>
