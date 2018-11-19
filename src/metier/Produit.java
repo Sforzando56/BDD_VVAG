@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import persistence.BddConnection;
 
 public class Produit {
@@ -19,16 +20,16 @@ public class Produit {
     private FloatProperty prixRevient;
     private IntegerProperty stock;
     private StringProperty emailUtilisateur;
-    private StringProperty nomCategorie;
+    private ObservableList<Categorie> categories;
 
 	public Produit(int idProduit, String nom, double prixRevient, int stock,
-			String emailUtilisateur, String nomCategorie) {
+			String emailUtilisateur, ObservableList<Categorie> categories) {
 		this.idProduit = new SimpleIntegerProperty(idProduit);
 		this.nom = new SimpleStringProperty(nom);
 		this.prixRevient = new SimpleFloatProperty((float) prixRevient);
 		this.stock = new SimpleIntegerProperty(stock);
 		this.emailUtilisateur = new SimpleStringProperty(emailUtilisateur);
-		this.nomCategorie = new SimpleStringProperty(nomCategorie);
+		this.categories = categories;
 	}
 
     public IntegerProperty getIdProduit() {

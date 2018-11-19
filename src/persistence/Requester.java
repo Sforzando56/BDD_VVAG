@@ -24,7 +24,7 @@ public class Requester {
     
 	public Produit createProduit(int id_produit, String nom, double prix_revient, int stock, String email_utilisateur, String nom_categorie) throws SQLException {
 		try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO Produit"
-				+ "(id_produit, nom, prix_revient, stock, email_utilisateur, nom_categorie) VALUES "
+				+ "(id_produit, nom, prix_revient, stock, email_utilisateur) VALUES "
 				+ "(?, ?, ?, ?, ?, ?)")){
 			stmt.setInt(1, id_produit);
 			stmt.setString(2, nom);
@@ -35,7 +35,16 @@ public class Requester {
 
 			ResultSet rs = stmt.executeQuery();
 			if(rs.next()) {
-				return new Produit(id_produit, nom, prix_revient, stock, email_utilisateur, nom_categorie);
+				String selectCategoriesSQL = "SELECT NOM_CATEGORIE, ID_PRODUIT FROM Categorie WHERE ID_PRODUIT = " + Integer.toString(id_produit);
+				Statement statement = BddConnection.getConnection().createStatement();
+				ObservableList<Categorie> categories = FXCollections.observableArrayList();
+
+				ResultSet rs2 = statement.executeQuery(selectCategoriesSQL);
+				while (rs2.next()) {
+					categories.add(new Categorie(rs2.getString("nom"), rs2.getString("description")));
+				}
+
+				return new Produit(id_produit, nom, prix_revient, stock, email_utilisateur, categories);
 			}
 			else {
 				throw new IllegalArgumentException("Problème à l'insertion de la catégorie " + nom);
@@ -46,8 +55,18 @@ public class Requester {
 	public Produit getProduit(int id_produit) throws SQLException {
 		try (Statement stmt = BddConnection.getConnection().createStatement()) {
 			ResultSet rs = stmt.executeQuery("SELECT * FROM Produit WHERE id_produit = '"+ id_produit +"'");
+
+			String selectCategoriesSQL = "SELECT NOM_CATEGORIE, ID_PRODUIT FROM Categorie WHERE ID_PRODUIT = " + Integer.toString(id_produit);
+			Statement statement = BddConnection.getConnection().createStatement();
+			ObservableList<Categorie> categories = FXCollections.observableArrayList();
+
+			ResultSet rs2 = statement.executeQuery(selectCategoriesSQL);
+			while (rs2.next()) {
+				categories.add(new Categorie(rs2.getString("nom"), rs2.getString("description")));
+			}
+
 			if (rs.next()) {
-				return new Produit(id_produit, rs.getString("nom"), rs.getDouble("prix_revient"), rs.getInt("stock"), rs.getString("email_utilisateur"), rs.getString("nom_categorie"));
+				return new Produit(id_produit, rs.getString("nom"), rs.getDouble("prix_revient"), rs.getInt("stock"), rs.getString("email_utilisateur"), categories);
 			} else {
 				throw new IllegalArgumentException("Le produit "+id_produit+" n'existe pas");
 			}
@@ -112,15 +131,6 @@ public class Requester {
                 ventes.add(
                         new Vente(rs.getInt("id_vente"), rs.getFloat("prix_dep"), rs.getTimestamp("date_fin"), produit)
                 );
-
-				String selectCategoriesSQL = "SELECT NOM_CATEGORIE, ID_PRODUIT FROM Categorie WHERE ID_PRODUIT = " + Integer.toString(id_produit);
-				statement = dbConnection.createStatement();
-				ObservableList<Categorie> categories = FXCollections.observableArrayList();
-
-				ResultSet rs2 = statement.executeQuery(selectCategoriesSQL);
-				while (rs2.next()) {
-					categories.add(new Categorie(rs2.getString("nom"), rs2.getString("description")));
-				}
             }
         } catch (SQLException e) {
             e.printStackTrace();
