@@ -1,2 +1,10 @@
 Baie-electronique-EA.pdf
 Baie_electronique.tar.gz
+.classpath
+.idea/
+.project
+bin/
+out/
+projet.iml
+.idea/*
+out/*

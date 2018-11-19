@@ -1,9 +1,7 @@
 package metier;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
+import javafx.beans.property.*;
+
 
 public class Utilisateur {
 
@@ -17,9 +15,13 @@ public class Utilisateur {
 
     private IntegerProperty codePostal;
 
-    private ListProperty<Produit> produits;
-
-    private ListProperty<Enchere> encheres;
+    public Utilisateur(String email, String nom, String prenom, String adresse, int codePostal) {
+        this.email = new SimpleStringProperty(email);
+        this.nom = new SimpleStringProperty(nom);
+        this.prenom = new SimpleStringProperty(prenom);
+        this.adresse = new SimpleStringProperty(adresse);
+        this.codePostal = new SimpleIntegerProperty(codePostal);
+    }
 
     public String getEmail() {
         return email.get();
@@ -61,19 +63,4 @@ public class Utilisateur {
         return codePostal;
     }
 
-    public ObservableList<Produit> getProduits() {
-        return produits.get();
-    }
-
-    public ListProperty<Produit> produitsProperty() {
-        return produits;
-    }
-
-    public ObservableList<Enchere> getEncheres() {
-        return encheres.get();
-    }
-
-    public ListProperty<Enchere> encheresProperty() {
-        return encheres;
-    }
 }

@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import persistence.BddConnection;
 
 public class Produit {
     private IntegerProperty idProduit;
@@ -68,7 +69,8 @@ public class Produit {
 		}
 	}
 
-	public IntegerProperty getIdProduit() {
+
+    public IntegerProperty getIdProduit() {
         return idProduit;
     }
 

@@ -1,16 +1,12 @@
 package metier;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-
 public class SalleVente {
     private int idSalle;
     private boolean montante;
     private boolean revocable;
     private Categorie categorie;
-    
-    
+    private boolean dureeLim;
+    private boolean enchereLibre;
 
     public SalleVente(int idSalle, boolean montante, boolean revocable, Categorie categorie) {
 		this.idSalle = idSalle;
@@ -18,8 +14,8 @@ public class SalleVente {
 		this.revocable = revocable;
 		this.categorie = categorie;
 	}
-    
-	public int getIdSalle() {
+
+    public int getIdSalle() {
         return idSalle;
     }
 
@@ -29,6 +25,14 @@ public class SalleVente {
 
     public boolean isRevocable() {
         return revocable;
+    }
+
+    public boolean isDureeLim() {
+        return dureeLim;
+    }
+
+    public boolean isEnchereLibre() {
+        return enchereLibre;
     }
 
     public Categorie getCategorie() {
