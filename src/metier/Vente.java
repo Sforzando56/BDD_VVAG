@@ -17,9 +17,10 @@ public class Vente {
     private FloatProperty prixEnCours;
     private Timestamp fin;
     private Produit produit;
+    
 
     
-    
+
     public Vente(int idVente, double prixDepart, Timestamp fin, Produit produit) {
 		this.idVente = idVente;
 		this.prixDepart = new SimpleFloatProperty((float) prixDepart);
