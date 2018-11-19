@@ -17,7 +17,6 @@ public class Vente {
     private FloatProperty prixEnCours;
     private Timestamp fin;
     private Produit produit;
-    
 
     
 

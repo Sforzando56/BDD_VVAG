@@ -126,7 +126,17 @@ public class Requester {
             ResultSet rs = statement.executeQuery(selectSallesSQL);
             while (rs.next()) {
             	int id_produit = rs.getInt("id_produit");
-                Produit produit = new Produit(id_produit, rs.getString("nom"), rs.getFloat("prix_revient"), rs.getInt("stock"), rs.getString("nom_utilisateur"), rs.getString("nom_categorie"));
+            	
+				String selectCategoriesSQL = "SELECT NOM_CATEGORIE, ID_PRODUIT FROM Categorie WHERE ID_PRODUIT = " + Integer.toString(id_produit);
+				statement = BddConnection.getConnection().createStatement();
+				ObservableList<Categorie> categories = FXCollections.observableArrayList();
+
+				ResultSet rs2 = statement.executeQuery(selectCategoriesSQL);
+				while (rs2.next()) {
+					categories.add(new Categorie(rs2.getString("nom"), rs2.getString("description")));
+				}
+            	
+                Produit produit = new Produit(id_produit, rs.getString("nom"), rs.getFloat("prix_revient"), rs.getInt("stock"), rs.getString("nom_utilisateur"), categories);
 
                 ventes.add(
                         new Vente(rs.getInt("id_vente"), rs.getFloat("prix_dep"), rs.getTimestamp("date_fin"), produit)
