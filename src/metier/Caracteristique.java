@@ -10,6 +10,12 @@ public class Caracteristique {
 
     private StringProperty description;
 
+    public Caracteristique(int idCaracteristique, StringProperty nom, StringProperty description) {
+        this.idCaracteristique = idCaracteristique;
+        this.nom = nom;
+        this.description = description;
+    }
+
     public int getIdCaracteristique() {
         return idCaracteristique;
     }

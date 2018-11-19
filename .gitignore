@@ -6,3 +6,5 @@ Baie_electronique.tar.gz
 bin/
 out/
 projet.iml
+.idea/*
+out/*
