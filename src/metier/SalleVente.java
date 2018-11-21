@@ -1,19 +1,28 @@
 package metier;
 
+
 public class SalleVente {
+
     private int idSalle;
+
     private boolean montante;
+
     private boolean revocable;
-    private Categorie categorie;
+
     private boolean dureeLim;
+
     private boolean enchereLibre;
 
-    public SalleVente(int idSalle, boolean montante, boolean revocable, Categorie categorie) {
-		this.idSalle = idSalle;
-		this.montante = montante;
-		this.revocable = revocable;
-		this.categorie = categorie;
-	}
+    private Categorie categorie;
+
+    public SalleVente(int idSalle, boolean montante, boolean revocable, boolean dureeLim, boolean enchereLibre, Categorie categorie) {
+        this.idSalle = idSalle;
+        this.montante = montante;
+        this.revocable = revocable;
+        this.categorie = categorie;
+        this.dureeLim = dureeLim;
+        this.enchereLibre = enchereLibre;
+    }
 
     public int getIdSalle() {
         return idSalle;
