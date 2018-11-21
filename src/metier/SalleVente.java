@@ -15,11 +15,13 @@ public class SalleVente {
 
     private Categorie categorie;
 
-    public SalleVente(int idSalle, boolean montante, boolean revocable, Categorie categorie) {
+    public SalleVente(int idSalle, boolean montante, boolean revocable, boolean dureeLim, boolean enchereLibre, Categorie categorie) {
         this.idSalle = idSalle;
         this.montante = montante;
         this.revocable = revocable;
         this.categorie = categorie;
+        this.dureeLim = dureeLim;
+        this.enchereLibre = enchereLibre;
     }
 
     public int getIdSalle() {
@@ -44,5 +46,10 @@ public class SalleVente {
 
     public Categorie getCategorie() {
         return categorie;
+    }
+
+    @Override
+    public String toString() {
+        return "Salle " + getCategorie().getNom();
     }
 }

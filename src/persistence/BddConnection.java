@@ -1,10 +1,9 @@
 package persistence;
-import metier.Categorie;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
+
+import metier.Utilisateur;
 
 public class BddConnection {
 	private static Connection con;
@@ -23,10 +22,7 @@ public class BddConnection {
 	
     public static void main(String[] args) {
     	BddConnection.getConnection();
-    	try {
-			Categorie.create("test4", "test description");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Requester req = new Requester();
+		req.upsertUtilisateur(new Utilisateur("test email", "nomUtilisateur ", "Prenom Utilisateur", "adresse test", 43300));
     }
 }

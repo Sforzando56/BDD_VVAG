@@ -1,31 +1,26 @@
 package metier;
 
 import javafx.beans.property.*;
-import javafx.collections.ObservableList;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 public class Vente {
-
     private int idVente;
-
     private FloatProperty prixDepart;
-
-    private FloatProperty prixEnCours;
-
     private Timestamp fin;
-
-    private ListProperty<Enchere> encheres;
-
     private Produit produit;
+    private int idSalle;
 
-    public Vente(int idVente, float prixDepart, Timestamp fin, Produit produit) {
+    public Vente(int idVente, float prixDepart, Timestamp fin, Produit produit, int idSalle) {
         this.idVente = idVente;
         this.prixDepart = new SimpleFloatProperty(prixDepart);
         this.fin = fin;
-        this.encheres = new SimpleListProperty<>();
         this.produit = produit;
+        this.idSalle = idSalle;
+    }
+
+    public int getIdSalle() {
+        return idSalle;
     }
 
     public int getIdVente() {
@@ -44,14 +39,6 @@ public class Vente {
         return fin;
     }
 
-    public ObservableList<Enchere> getEncheres() {
-        return encheres.get();
-    }
-
-    public ListProperty<Enchere> encheresProperty() {
-        return encheres;
-    }
-
     public Produit getProduit() {
         return produit;
     }
@@ -60,9 +47,8 @@ public class Vente {
         return getProduit().nomProperty();
     }
 
-    public FloatProperty getPrixEnCours() {
-        return prixEnCours;
+
+    public void setIdSalle(int idSalle) {
+        this.idSalle = idSalle;
     }
-
-
 }
