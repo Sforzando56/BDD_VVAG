@@ -5,15 +5,10 @@ import javafx.beans.property.*;
 import java.sql.Timestamp;
 
 public class Vente {
-
     private int idVente;
-
     private FloatProperty prixDepart;
-
     private Timestamp fin;
-
     private Produit produit;
-
     private int idSalle;
 
     public Vente(int idVente, float prixDepart, Timestamp fin, Produit produit, int idSalle) {
