@@ -48,9 +48,16 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         requester = Requester.getInstance();
 
-        salles = requester.getSallesVentes();
-
-        listViewSalles.setItems(salles);
+        listViewSalles.getSelectionModel().selectedItemProperty().
+                addListener(new ChangeListener<SalleVente>() {
+                    @Override
+                    public void changed(ObservableValue<? extends SalleVente> observableValue, SalleVente oldSalleVente, SalleVente newSalleVente) {
+                        ventesTables.setItems(requester.getVentesBySalle(newSalleVente.getIdSalle()));
+                    }
+                });
+        prixColumn.setCellValueFactory(new PropertyValueFactory<>("prixEnCours"));
+        nomProduitColumn.setCellValueFactory(new PropertyValueFactory<>("nomProduit"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("fin"));
         listViewSalles.setCellFactory(param -> new ListCell<SalleVente>() {
             @Override
             protected void updateItem(SalleVente item, boolean empty) {
@@ -62,18 +69,12 @@ public class FXMLDocumentController implements Initializable {
                 }
             }
         });
+        update();
+    }
 
-        prixColumn.setCellValueFactory(new PropertyValueFactory<>("prixEnCours"));
-        nomProduitColumn.setCellValueFactory(new PropertyValueFactory<>("nomProduit"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("fin"));
-
-        listViewSalles.getSelectionModel().selectedItemProperty().
-                addListener(new ChangeListener<SalleVente>() {
-                    @Override
-                    public void changed(ObservableValue<? extends SalleVente> observableValue, SalleVente oldSalleVente, SalleVente newSalleVente) {
-                        ventesTables.setItems(requester.getVentesBySalle(newSalleVente.getIdSalle()));
-                    }
-                });
+    public void update(){
+        salles = requester.getSallesVentes();
+        listViewSalles.setItems(salles);
     }
 
     @FXML
@@ -81,6 +82,8 @@ public class FXMLDocumentController implements Initializable {
         ajoutVenteStage = new Stage();
         ajoutVenteStage.setTitle("Ajouter une vente");
         FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutVente.fxml"));
+        AjoutVenteController controller = new AjoutVenteController(this.salles, ajoutVenteStage, this);
+        fxmloader.setController(controller);
         Parent root;
         try {
             root = fxmloader.load();
