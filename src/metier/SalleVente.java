@@ -47,4 +47,9 @@ public class SalleVente {
     public Categorie getCategorie() {
         return categorie;
     }
+
+    @Override
+    public String toString() {
+        return "Salle " + getCategorie().getNom();
+    }
 }
