@@ -27,27 +27,6 @@ public class Vente {
 		this.produit = produit;
 	}
 
-
-	public static ArrayList<Vente> seek(int idSalle) throws SQLException{
-		ArrayList<Vente> ventes = new ArrayList<Vente>();
-		try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Vente WHERE id_salle = ?")) {
-			stmt.setInt(1, idSalle);
-			
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				int id_vente = rs.getInt("id_vente");
-				double prix_depart = rs.getInt("prix_dep");
-				Timestamp fin = rs.getTimestamp("date_fin");
-				int id_produit = rs.getInt("id_produit");
-				int id_salle = rs.getInt("id_salle");
-				ventes.add(new Vente(id_vente, prix_depart, fin, Produit.load(id_produit)));
-			}
-
-		}
-		return ventes;
-    }
-
-    
     public Vente(int idVente, float prixDepart, Timestamp fin, Produit produit) {
         this.idVente = idVente;
         this.prixDepart = new SimpleFloatProperty(prixDepart);

@@ -103,7 +103,7 @@ public class AjoutVenteController implements Initializable {
         }
 
         Utilisateur utilisateur = new Utilisateur(emailTextfield.getText(), nomTextfield.getText(), prenomTextfield.getText(), addressTextfield.getText(), Integer.parseInt(codePostalTextfield.getText()));
-        Produit produit = new Produit(0, nomProduitTextfield.getText(), Float.parseFloat(prixRevientTextfield.getText()), Integer.parseInt(quantiteTextfield.getText()));
+        //Produit produit = new Produit(0, nomProduitTextfield.getText(), Float.parseFloat(prixRevientTextfield.getText()), Integer.parseInt(quantiteTextfield.getText()));
     }
 
     private void showAlert(Alert.AlertType alertType, Window owner, String title, String message) {
