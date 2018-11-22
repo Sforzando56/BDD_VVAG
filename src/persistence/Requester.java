@@ -1,10 +1,20 @@
 package persistence;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import metier.*;
-
-import java.sql.*;
+import metier.Categorie;
+import metier.Enchere;
+import metier.Produit;
+import metier.SalleVente;
+import metier.Utilisateur;
+import metier.Vente;
 
 public class Requester {
 
@@ -57,6 +67,42 @@ public class Requester {
         }
 
         return salles;
+    }
+    
+    public void upsertEnchere(Enchere enchere) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (prixAchat, quantProposee, date_enchere, email_utilisateur, id_vente)"
+                + " VALUES "
+                + "(?, ?, ?, ?, ?)")) {
+            stmt.setDouble(1, enchere.getPrixAchat().get());
+            stmt.setInt(2, enchere.getQuantProposee().get());
+            stmt.setTimestamp(3, enchere.getDateEnchere());
+            stmt.setString(4, enchere.getEmailUtilisateur().get());
+            stmt.setInt(5, enchere.getIdVente());
+
+            stmt.executeQuery();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            //Enchere déjà dans la base, on pourrait update
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public ObservableList<Enchere> getEncheresByVente(int idVente) {
+        ObservableList<Enchere> encheres = FXCollections.observableArrayList();
+
+		try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Enchere WHERE id_vente = ?")) {
+			stmt.setInt(1, idVente);
+			
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				encheres.add(new Enchere(rs.getInt("id_enchere"), rs.getInt("id_vente"), (float) rs.getDouble("prixAchat"), rs.getTimestamp("date_enchere"), rs.getInt("quantProposee"), rs.getString("email_utilisateur")));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return encheres;
     }
 
     public ObservableList<Vente> getVentesBySalle(int idSalle) {

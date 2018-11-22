@@ -5,9 +5,9 @@ DROP TABLE Vente_Duree_Limitee PURGE;
 DROP TABLE Vente_Enchere_Unique PURGE;
 DROP TABLE Vente_Descendante PURGE;
 DROP TABLE Vente PURGE;
+DROP TABLE Salle PURGE;
 DROP TABLE Caracteristique PURGE;
 DROP TABLE Produit PURGE;
-DROP TABLE Salle PURGE;
 DROP TABLE Categorie PURGE;
 DROP TABLE Utilisateur PURGE;
 
@@ -87,6 +87,8 @@ CREATE TABLE CategorieProduit(
 
 CREATE TABLE Enchere(
   id_enchere INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  prixAchat NUMERIC(10, 2) NOT NULL CHECK(prixAchat > 0),
+  quantProposee INT NOT NULL CHECK(quantProposee > 0),
   date_enchere TIMESTAMP NOT NULL,
   email_utilisateur VARCHAR2(30),
   id_vente INT,
