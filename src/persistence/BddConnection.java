@@ -19,10 +19,4 @@ public class BddConnection {
 		}
 		return con;
 	}
-	
-    public static void main(String[] args) {
-    	BddConnection.getConnection();
-		Requester req = new Requester();
-		req.upsertUtilisateur(new Utilisateur("test email", "nomUtilisateur ", "Prenom Utilisateur", "adresse test", 43300));
-    }
 }

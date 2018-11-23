@@ -50,6 +50,14 @@ public class SalleVente {
 
     @Override
     public String toString() {
-        return "Salle " + getCategorie().getNom();
+
+        return "Salle " + getCategorie().getNom() + boolToString(montante, "M") + boolToString(enchereLibre, "EL");
+    }
+
+    private String boolToString(boolean att, String aff){
+        if (att){
+            return aff;
+        }
+        return "Non " + aff;
     }
 }

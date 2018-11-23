@@ -34,7 +34,11 @@ public class Enchere {
 		return idVente;
 	}
 
-	public FloatProperty getPrixAchat() {
+	public float getPrixAchat() {
+		return prixAchat.get();
+	}
+
+	public FloatProperty prixAchatProperty() {
 		return prixAchat;
 	}
 
@@ -42,11 +46,19 @@ public class Enchere {
 		return dateEnchere;
 	}
 
-	public IntegerProperty getQuantProposee() {
+	public int getQuantProposee() {
+		return quantProposee.get();
+	}
+
+	public IntegerProperty quantProposeeProperty() {
 		return quantProposee;
 	}
 
-	public StringProperty getEmailUtilisateur() {
+	public String getEmailUtilisateur() {
+		return emailUtilisateur.get();
+	}
+
+	public StringProperty emailUtilisateurProperty() {
 		return emailUtilisateur;
 	}
 }

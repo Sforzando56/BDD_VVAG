@@ -13,14 +13,11 @@ public class Utilisateur {
 
     private StringProperty adresse;
 
-    private IntegerProperty codePostal;
-
-    public Utilisateur(String email, String nom, String prenom, String adresse, int codePostal) {
+    public Utilisateur(String email, String nom, String prenom, String adresse) {
         this.email = new SimpleStringProperty(email);
         this.nom = new SimpleStringProperty(nom);
         this.prenom = new SimpleStringProperty(prenom);
         this.adresse = new SimpleStringProperty(adresse);
-        this.codePostal = new SimpleIntegerProperty(codePostal);
     }
 
     public String getEmail() {
@@ -54,13 +51,4 @@ public class Utilisateur {
     public StringProperty adresseProperty() {
         return adresse;
     }
-
-    public int getCodePostal() {
-        return codePostal.get();
-    }
-
-    public IntegerProperty codePostalProperty() {
-        return codePostal;
-    }
-
 }
