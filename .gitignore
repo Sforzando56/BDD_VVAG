@@ -1,5 +1,5 @@
-Baie-electronique-EA.pdf
-Baie_electronique.tar.gz
+*.pdf
+*.tar.gz
 .classpath
 .idea/
 .project

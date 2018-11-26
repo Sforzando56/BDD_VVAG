@@ -36,10 +36,8 @@ CREATE TABLE Produit(
   id_produit INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   prix_revient NUMERIC(10, 2),
   stock INT NOT NULL CHECK(stock >= 0),
-  email_utilisateur VARCHAR2(30) ,
-  nom_categorie VARCHAR2(30) ,
-  FOREIGN KEY(email_utilisateur) REFERENCES Utilisateur (email),
-  FOREIGN KEY (nom_categorie) REFERENCES Categorie (nom)
+  email_utilisateur VARCHAR2(30),
+  FOREIGN KEY(email_utilisateur) REFERENCES Utilisateur (email)
 );
 
 CREATE TABLE Caracteristique(
@@ -67,9 +65,6 @@ CREATE TABLE CategorieProduit(
   FOREIGN KEY(nom_categorie) REFERENCES Categorie(nom),
   FOREIGN KEY(id_produit) REFERENCES Produit(id_produit)
 );
-
-
-
 
 CREATE TABLE Enchere(
   id_enchere INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
