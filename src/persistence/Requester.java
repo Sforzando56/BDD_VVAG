@@ -1,10 +1,22 @@
 package persistence;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import metier.*;
+import metier.Categorie;
+import metier.Enchere;
+import metier.Produit;
+import metier.SalleVente;
+import metier.Utilisateur;
+import metier.Vente;
 
-import java.sql.*;
+import static javafx.application.Platform.exit;
 
 public class Requester {
 
@@ -19,6 +31,10 @@ public class Requester {
             return 1;
         }
         return 0;
+    }
+
+    private Requester() {
+
     }
 
     public static Requester getInstance() {
@@ -59,6 +75,42 @@ public class Requester {
         return salles;
     }
 
+    public void insertEnchere(Enchere enchere) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (prixAchat, quantProposee, date_enchere, email_utilisateur, id_vente)"
+                + " VALUES "
+                + "(?, ?, ?, ?, ?)")) {
+            stmt.setDouble(1, enchere.getPrixAchat());
+            stmt.setInt(2, enchere.getQuantProposee());
+            stmt.setTimestamp(3, enchere.getDateEnchere());
+            stmt.setString(4, enchere.getEmailUtilisateur());
+            stmt.setInt(5, enchere.getIdVente());
+
+            stmt.executeQuery();
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            //Enchere déjà dans la base, on pourrait update
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ObservableList<Enchere> getEncheresByVente(int idVente) {
+        ObservableList<Enchere> encheres = FXCollections.observableArrayList();
+
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Enchere WHERE id_vente = ?")) {
+            stmt.setInt(1, idVente);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                encheres.add(new Enchere(rs.getInt("id_enchere"), rs.getInt("id_vente"), (float) rs.getDouble("prixAchat"), rs.getTimestamp("date_enchere"), rs.getInt("quantProposee"), rs.getString("email_utilisateur")));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return encheres;
+    }
+
     public ObservableList<Vente> getVentesBySalle(int idSalle) {
         ObservableList<Vente> ventes = FXCollections.observableArrayList();
 
@@ -86,12 +138,11 @@ public class Requester {
     public void upsertUtilisateur(Utilisateur utilisateur) {
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO UTILISATEUR"
                 + " VALUES "
-                + "(?, ?, ?, ?, ?)")) {
+                + "(?, ?, ?, ?)")) {
             stmt.setString(1, utilisateur.getEmail());
             stmt.setString(2, utilisateur.getNom());
             stmt.setString(3, utilisateur.getPrenom());
-            stmt.setInt(4, utilisateur.getCodePostal());
-            stmt.setString(5, utilisateur.getAdresse());
+            stmt.setString(4, utilisateur.getAdresse());
 
             stmt.executeQuery();
 
@@ -168,10 +219,9 @@ public class Requester {
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
 
-            if (rs.next()){
+            if (rs.next()) {
                 return rs.getInt(1);
-            }
-            else {
+            } else {
                 return -1;
             }
         }
@@ -191,4 +241,73 @@ public class Requester {
             e.printStackTrace();
         }
     }
+
+    public Enchere getDerniereEnchere(int idVente) {
+        String selectSallesSQL = "SELECT * from Enchere E, Vente V" +
+                "ORDER BY E.date DESC WHERE E.id_vente = V.id_vente AND E.rownum = 1";
+
+        try {
+            Connection dbConnection = BddConnection.getConnection();
+            Statement statement = dbConnection.createStatement();
+
+            ResultSet rs = statement.executeQuery(selectSallesSQL);
+            if (rs.next()) {
+                return new Enchere(
+                        rs.getInt("id_enchere"), idVente,
+                        rs.getFloat("prix_achat"),
+                        rs.getTimestamp("date_enchere"),
+                        rs.getInt("quant_proposee"),
+                        rs.getString("email_utilisateur")
+                );
+            } else {
+                System.out.println("Erreur requete get prix en cours");
+                exit();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+
+        return null;
+    }
+
+    public Utilisateur getUtilisateur(String emailUtilisateur) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Utilisateur WHERE email = ?")) {
+            stmt.setString(1, emailUtilisateur);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Utilisateur(emailUtilisateur, rs.getString("nom"), rs.getString("prenom"), rs.getString("adresse"));
+            } else {
+                System.out.println("Erreur requete get utilisateur");
+                exit();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return null;
+    }
+
+    public Utilisateur getUtilisateurFromVente(int idVente) {
+        try (PreparedStatement stmt = BddConnection.getConnection()
+                .prepareStatement("SELECT * FROM Utilisateur U, Vente V WHERE id_vente = ? AND V.email_utilisateur = U.email")) {
+            stmt.setInt(1, idVente);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Utilisateur(rs.getString("email"), rs.getString("nom"), rs.getString("prenom"), rs.getString("adresse"));
+            } else {
+                System.out.println("Erreur requete get utilisateur");
+                exit();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return null;
+    }
+
 }

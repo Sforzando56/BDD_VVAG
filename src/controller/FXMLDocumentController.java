@@ -11,14 +11,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import metier.Categorie;
+import metier.Enchere;
 import metier.SalleVente;
 import metier.Vente;
 import persistence.Requester;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 import java.util.ResourceBundle;
 
@@ -43,6 +47,10 @@ public class FXMLDocumentController implements Initializable {
 
     private Stage ajoutVenteStage;
 
+    private Stage enchereVenteStage;
+
+    private Stage venteFinieStage;
+
     private Requester requester;
 
     public void initialize(URL url, ResourceBundle rb) {
@@ -55,7 +63,7 @@ public class FXMLDocumentController implements Initializable {
                         ventesTables.setItems(requester.getVentesBySalle(newSalleVente.getIdSalle()));
                     }
                 });
-        prixColumn.setCellValueFactory(new PropertyValueFactory<>("prixEnCours"));
+        prixColumn.setCellValueFactory(new PropertyValueFactory<>("prixDepart"));
         nomProduitColumn.setCellValueFactory(new PropertyValueFactory<>("nomProduit"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("fin"));
         listViewSalles.setCellFactory(param -> new ListCell<SalleVente>() {
@@ -65,7 +73,7 @@ public class FXMLDocumentController implements Initializable {
                 if (item == null || empty) {
                     setText(null);
                 } else {
-                    setText("Salle " + item.getCategorie().getNom());
+                    setText(item.toString());
                 }
             }
         });
@@ -97,5 +105,57 @@ public class FXMLDocumentController implements Initializable {
         ajoutVenteStage.show();
     }
 
+    @FXML
+    public void onVenteClicked(MouseEvent e){
+        if(e.getClickCount() != 2){
+            return;
+        }
+        Vente vente = ventesTables.getSelectionModel().getSelectedItem();
+        Enchere derniereEnchere = requester.getDerniereEnchere(vente.getIdVente());
+        Timestamp now = Timestamp.from(Instant.now());
+        if (now.compareTo(vente.getFin()) < 0){
+            afficheVenteFinie(vente, derniereEnchere);
+        }
+        else {
+            afficheVenteEnCours(vente, derniereEnchere);
+        }
+    }
 
+    private void afficheVenteEnCours(Vente vente, Enchere enchere){
+        enchereVenteStage = new Stage();
+        enchereVenteStage.setTitle("Enchérir sur vente");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/EnchereVente.fxml"));
+        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, enchere);
+        loader.setController(enchereVenteController);
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return;
+        }
+        Scene scene = new Scene(root);
+        enchereVenteStage.setScene(scene);
+
+        enchereVenteStage.show();
+    }
+
+    private void afficheVenteFinie(Vente vente, Enchere enchere){
+        venteFinieStage = new Stage();
+        venteFinieStage.setTitle("Enchérir sur vente");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/VenteFinie.fxml"));
+        VenteFinieController enchereVenteController = new VenteFinieController(vente, enchere);
+        loader.setController(enchereVenteController);
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return;
+        }
+        Scene scene = new Scene(root);
+        venteFinieStage.setScene(scene);
+
+        venteFinieStage.show();
+    }
 }

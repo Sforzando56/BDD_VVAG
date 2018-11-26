@@ -12,17 +12,11 @@ public class BddConnection {
 		if(con == null) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-				con = DriverManager.getConnection("jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1", "donnea", "donnea");
+				con = DriverManager.getConnection("jdbc:oracle:thin:@ensioracle1.imag.fr:1521:ensioracle1", "vandaevi", "vandaevi");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		return con;
 	}
-	
-    public static void main(String[] args) {
-    	BddConnection.getConnection();
-		Requester req = new Requester();
-		req.upsertUtilisateur(new Utilisateur("test email", "nomUtilisateur ", "Prenom Utilisateur", "adresse test", 43300));
-    }
 }

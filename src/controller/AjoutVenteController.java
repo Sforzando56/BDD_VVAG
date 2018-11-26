@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static utils.AlertCreator.showAlert;
+
 public class AjoutVenteController implements Initializable {
 
     @FXML
@@ -38,9 +40,6 @@ public class AjoutVenteController implements Initializable {
 
     @FXML
     TextField prixRevientTextfield;
-
-    @FXML
-    TextField codePostalTextfield;
 
     @FXML
     TextField addressTextfield;
@@ -80,7 +79,7 @@ public class AjoutVenteController implements Initializable {
 
     private FXMLDocumentController fxmlDocumentController;
 
-    public AjoutVenteController(ObservableList<SalleVente> salles, Stage ajoutVenteStage, FXMLDocumentController fxmlDocumentController) {
+    AjoutVenteController(ObservableList<SalleVente> salles, Stage ajoutVenteStage, FXMLDocumentController fxmlDocumentController) {
         this.salleVentes = salles;
         this.ajoutVenteStage = ajoutVenteStage;
         this.fxmlDocumentController = fxmlDocumentController;
@@ -104,10 +103,6 @@ public class AjoutVenteController implements Initializable {
         }
         if (addressTextfield.getText().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez votre adresse");
-            error = true;
-        }
-        if (codePostalTextfield.getText().isEmpty() || !StringUtils.isNumeric(codePostalTextfield.getText())) {
-            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez votre code postal, qui est numérique");
             error = true;
         }
         if (categorieTextfield.getText().isEmpty()) {
@@ -142,7 +137,7 @@ public class AjoutVenteController implements Initializable {
     private void onValiderAjout() {
         boolean error = validateFormulaire();
         if (!error) {
-            Utilisateur utilisateur = new Utilisateur(emailTextfield.getText(), nomTextfield.getText(), prenomTextfield.getText(), addressTextfield.getText(), Integer.parseInt(codePostalTextfield.getText()));
+            Utilisateur utilisateur = new Utilisateur(emailTextfield.getText(), nomTextfield.getText(), prenomTextfield.getText(), addressTextfield.getText());
             requester.upsertUtilisateur(utilisateur);
             String[] categories = categorieTextfield.getText().split("-");
             List<Categorie> categorieList = new ArrayList<>();
@@ -194,17 +189,8 @@ public class AjoutVenteController implements Initializable {
             }
             requester.insertVente(vente);
             ajoutVenteStage.close();
-            this.showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Vente ajoutée");
+            showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Vente ajoutée");
         }
         this.fxmlDocumentController.update();
-    }
-
-    private void showAlert(Alert.AlertType alertType, Window owner, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.initOwner(owner);
-        alert.show();
     }
 }

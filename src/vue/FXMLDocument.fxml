@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:controller="controller.FXMLDocumentController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.FXMLDocumentController">
     <left>
         <ListView fx:id="listViewSalles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
     </left>
     <center>
-        <TableView fx:id="ventesTables" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="ventesTables" onMouseClicked="#onVenteClicked" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="nomProduitColumn" prefWidth="103.0" text="Produit" />
-                <TableColumn fx:id="prixColumn" prefWidth="170.0" text="Prix En cours" />
+                <TableColumn fx:id="prixColumn" prefWidth="170.0" text="Prix départ" />
                 <TableColumn fx:id="dateColumn" prefWidth="123.0" text="Fin" />
             </columns>
         </TableView>
