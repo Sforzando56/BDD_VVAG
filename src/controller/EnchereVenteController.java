@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import metier.Enchere;
+import metier.SalleVente;
 import metier.Utilisateur;
 import metier.Vente;
 import org.apache.commons.lang3.StringUtils;
@@ -58,24 +59,31 @@ public class EnchereVenteController implements Initializable {
     @FXML
     TextField prixAchatTextfield;
 
+    private SalleVente salleVente;
+
     private Vente vente;
 
     private Enchere derniereEnchere;
 
     private Stage enchereVenteStage;
 
-    EnchereVenteController(Vente vente, Stage stage, Enchere enchere) {
+    EnchereVenteController(Vente vente, Stage stage, Enchere enchere, SalleVente salleVente) {
         this.vente = vente;
         this.derniereEnchere = enchere;
+        this.salleVente = salleVente;
         enchereVenteStage = stage;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Utilisateur utilisateur = Requester.getInstance().getUtilisateurFromVente(vente.getIdVente());
+        Utilisateur utilisateur = Requester.getInstance().getUtilisateurFromProduit(vente.getProduit());
         fullnameVendeurLabel.setText(utilisateur.getPrenom() + " " + utilisateur.getNom());
         nomProduitLabel.setText(vente.getProduit().getNom());
-        prixEnCoursLabel.setText(String.valueOf(derniereEnchere.getPrixAchat()));
+        if (derniereEnchere == null) {
+            prixEnCoursLabel.setText(String.valueOf(vente.getPrixDepart()));
+        } else {
+            prixEnCoursLabel.setText(String.valueOf(derniereEnchere.getPrixAchat()));
+        }
         stockLabel.setText(String.valueOf(vente.getProduit().getStock()));
         finLabel.setText(String.valueOf(vente.getFin()));
     }
@@ -106,8 +114,19 @@ public class EnchereVenteController implements Initializable {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez le prix de revient du produit");
             error = true;
         }
-        if (Float.parseFloat(prixAchatTextfield.getText()) <= derniereEnchere.getPrixAchat()){
+        float prixAComp;
+        if (derniereEnchere != null) {
+            prixAComp = derniereEnchere.getPrixAchat();
+        } else {
+            prixAComp = vente.getPrixDepart();
+        }
+        if (Float.parseFloat(prixAchatTextfield.getText()) <= prixAComp) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Le prix proposé doit dépassé le prix en cours");
+            error = true;
+        }
+
+        if (Integer.parseInt(quantProposeeTextfield.getText()) <= vente.getProduit().getStock() || Integer.parseInt(quantProposeeTextfield.getText()) <= 0) {
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "La quant ne peut dépasser le stock et > 0");
             error = true;
         }
         return error;
@@ -115,6 +134,7 @@ public class EnchereVenteController implements Initializable {
 
     @FXML
     public void onEncherit() {
+        //Recomparer date de fin
         boolean error = validateFormulaire();
         if (error) {
             return;
@@ -129,8 +149,15 @@ public class EnchereVenteController implements Initializable {
                 Integer.parseInt(quantProposeeTextfield.getText()),
                 utilisateur.getEmail()
         );
+        if (!salleVente.isDureeLim()) {
+            Instant instant = Instant.now();
+            instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
+            vente.setFin(Timestamp.from(instant));
+            Requester.getInstance().updateDateVente(vente);
+        }
         Requester.getInstance().insertEnchere(enchere);
         enchereVenteStage.close();
         showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Enchere Confirmee");
+        enchereVenteStage.close();
     }
 }

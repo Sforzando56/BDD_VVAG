@@ -53,6 +53,8 @@ public class FXMLDocumentController implements Initializable {
 
     private Requester requester;
 
+    private SalleVente salleSelec;
+
     public void initialize(URL url, ResourceBundle rb) {
         requester = Requester.getInstance();
 
@@ -61,6 +63,7 @@ public class FXMLDocumentController implements Initializable {
                     @Override
                     public void changed(ObservableValue<? extends SalleVente> observableValue, SalleVente oldSalleVente, SalleVente newSalleVente) {
                         ventesTables.setItems(requester.getVentesBySalle(newSalleVente.getIdSalle()));
+                        salleSelec = newSalleVente;
                     }
                 });
         prixColumn.setCellValueFactory(new PropertyValueFactory<>("prixDepart"));
@@ -113,7 +116,7 @@ public class FXMLDocumentController implements Initializable {
         Vente vente = ventesTables.getSelectionModel().getSelectedItem();
         Enchere derniereEnchere = requester.getDerniereEnchere(vente.getIdVente());
         Timestamp now = Timestamp.from(Instant.now());
-        if (now.compareTo(vente.getFin()) < 0){
+        if (now.compareTo(vente.getFin()) > 0){
             afficheVenteFinie(vente, derniereEnchere);
         }
         else {
@@ -125,7 +128,7 @@ public class FXMLDocumentController implements Initializable {
         enchereVenteStage = new Stage();
         enchereVenteStage.setTitle("Enchérir sur vente");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/EnchereVente.fxml"));
-        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, enchere);
+        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, enchere, salleSelec);
         loader.setController(enchereVenteController);
         Parent root;
         try {

@@ -76,7 +76,7 @@ public class Requester {
     }
 
     public void insertEnchere(Enchere enchere) {
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (prixAchat, quantProposee, date_enchere, email_utilisateur, id_vente)"
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (PRIX_ACHAT, QUANT_PROPOSEE, DATE_ENCHERE, EMAIL_UTILISATEUR, ID_VENTE)"
                 + " VALUES "
                 + "(?, ?, ?, ?, ?)")) {
             stmt.setDouble(1, enchere.getPrixAchat());
@@ -205,6 +205,18 @@ public class Requester {
         }
     }
 
+    public void updateDateVente(Vente vente){
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("UPDATE Vente set "
+                + "DATE_FIN = ? WHERE id_vente = ?")) {
+            stmt.setTimestamp(1, vente.getFin());
+            stmt.setInt(2, vente.getIdVente());
+
+            stmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int insertSalle(SalleVente salleVente) throws Exception {
         String[] generatedId = {"id_salle"};
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO SALLE"
@@ -243,8 +255,8 @@ public class Requester {
     }
 
     public Enchere getDerniereEnchere(int idVente) {
-        String selectSallesSQL = "SELECT * from Enchere E, Vente V" +
-                "ORDER BY E.date DESC WHERE E.id_vente = V.id_vente AND E.rownum = 1";
+        String selectSallesSQL = "SELECT * from Enchere E, Vente V " +
+                "WHERE V.id_vente = " + idVente + " AND E.id_vente = V.id_vente AND ROWNUM = 1 ORDER BY E.date_enchere DESC ";
 
         try {
             Connection dbConnection = BddConnection.getConnection();
@@ -260,8 +272,7 @@ public class Requester {
                         rs.getString("email_utilisateur")
                 );
             } else {
-                System.out.println("Erreur requete get prix en cours");
-                exit();
+                return null;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -290,10 +301,10 @@ public class Requester {
         return null;
     }
 
-    public Utilisateur getUtilisateurFromVente(int idVente) {
+    public Utilisateur getUtilisateurFromProduit(Produit produit) {
         try (PreparedStatement stmt = BddConnection.getConnection()
-                .prepareStatement("SELECT * FROM Utilisateur U, Vente V WHERE id_vente = ? AND V.email_utilisateur = U.email")) {
-            stmt.setInt(1, idVente);
+                .prepareStatement("SELECT * FROM Utilisateur U, Produit P WHERE P.id_produit = ? AND P.email_utilisateur = U.email")) {
+            stmt.setInt(1, produit.getIdProduit());
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
