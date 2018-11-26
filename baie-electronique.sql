@@ -66,9 +66,6 @@ CREATE TABLE CategorieProduit(
   FOREIGN KEY(id_produit) REFERENCES Produit(id_produit)
 );
 
-
-
-
 CREATE TABLE Enchere(
   id_enchere INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   date_enchere TIMESTAMP NOT NULL,
