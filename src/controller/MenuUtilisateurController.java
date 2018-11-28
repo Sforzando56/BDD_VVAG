@@ -2,7 +2,6 @@ package controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import metier.Categorie;
 import metier.Enchere;
 import metier.SalleVente;
 import metier.Vente;
@@ -26,7 +24,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-public class FXMLDocumentController implements Initializable {
+public class MenuUtilisateurController implements Initializable {
 
     @FXML
     private ListView<SalleVente> listViewSalles = new ListView<>();
@@ -92,8 +90,8 @@ public class FXMLDocumentController implements Initializable {
     private void onAjouterVente() {
         ajoutVenteStage = new Stage();
         ajoutVenteStage.setTitle("Ajouter une vente");
-        FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutVente.fxml"));
-        AjoutVenteController controller = new AjoutVenteController(this.salles, ajoutVenteStage, this);
+        FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutProduit.fxml"));
+        AjoutProduitController controller = new AjoutProduitController( ajoutVenteStage);
         fxmloader.setController(controller);
         Parent root;
         try {

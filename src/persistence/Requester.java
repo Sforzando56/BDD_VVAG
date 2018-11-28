@@ -188,7 +188,7 @@ public class Requester {
         }
     }
 
-    public void insertProduitAndCategories(Produit produit, String emailUtilisateur) {
+    public void insertProduit(Produit produit, String emailUtilisateur) {
         String[] generatedId = {"id_produit"};
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO Produit"
                 + "(nom, prix_revient, stock, email_utilisateur) VALUES "
@@ -207,20 +207,6 @@ public class Requester {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-
-        for (Categorie categorie : produit.getCategories()) {
-            this.upsertCategorie(categorie);
-            try (PreparedStatement stmt2 = BddConnection.getConnection().prepareStatement(
-                    "INSERT INTO CATEGORIEPRODUIT VALUES (?,?)"
-            )) {
-                stmt2.setString(1, categorie.getNom());
-                stmt2.setInt(2, produit.getIdProduit());
-
-                stmt2.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -273,7 +259,7 @@ public class Requester {
         }
     }
 
-    private void upsertCategorie(Categorie categorie) {
+    public void upsertCategorie(Categorie categorie) {
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO CATEGORIE"
                 + " VALUES "
                 + "(?, ?)")) {
@@ -374,4 +360,34 @@ public class Requester {
         return null;
     }
 
+    public ObservableList<Produit> getProduitsNonEnVente(){
+        ObservableList<Produit> produits = FXCollections.observableArrayList();
+
+        try (PreparedStatement stmt = BddConnection.getConnection()
+                .prepareStatement("SELECT * FROM Produit P WHERE  P.ID_PRODUIT NOT IN (Select id_produit from VENTE)")) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                produits.add(new Produit(rs.getInt("id_produit"), rs.getString("nom"), rs.getFloat("prix_revient"), rs.getInt("stock"), null));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return produits;
+    }
+
+    public void insertCategorieProduit(Categorie categorie, Produit produit){
+        try (PreparedStatement stmt2 = BddConnection.getConnection().prepareStatement(
+                "INSERT INTO CATEGORIEPRODUIT VALUES (?,?)"
+        )) {
+            stmt2.setString(1, categorie.getNom());
+            stmt2.setInt(2, produit.getIdProduit());
+
+            stmt2.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

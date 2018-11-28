@@ -12,8 +12,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Salles de vente");
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/vue/FXMLDocument.fxml"));
+        stage.setTitle("Entrée");
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/vue/MenuEntree.fxml"));
         Parent root;
         try {
             root = fxmlLoader.load();
