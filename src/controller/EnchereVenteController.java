@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -13,6 +14,7 @@ import metier.Utilisateur;
 import metier.Vente;
 import org.apache.commons.lang3.StringUtils;
 import persistence.Requester;
+import utils.AlertCreator;
 
 import java.net.URL;
 import java.sql.Timestamp;
@@ -125,7 +127,7 @@ public class EnchereVenteController implements Initializable {
             error = true;
         }
 
-        if (Integer.parseInt(quantProposeeTextfield.getText()) > vente.getProduit().getStock() || Integer.parseInt(quantProposeeTextfield.getText()) <= 0) {
+        if ((Integer.parseInt(quantProposeeTextfield.getText()) > vente.getProduit().getStock()) || (Integer.parseInt(quantProposeeTextfield.getText()) <= 0)) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "La quant ne peut dépasser le stock et > 0");
             error = true;
         }
@@ -134,11 +136,33 @@ public class EnchereVenteController implements Initializable {
 
     @FXML
     public void onEncherit() {
-        //Recomparer date de fin
+        Timestamp now = Timestamp.from(Instant.now());
+        if (now.compareTo(vente.getFin()) > 0) {
+            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "La vente est désormais terminée");
+            enchereVenteStage.close();
+            return;
+        }
+
         boolean error = validateFormulaire();
         if (error) {
             return;
         }
+        boolean peutEncherir = true;
+        if (!salleVente.isEnchereLibre()) {
+            ObservableList<Enchere> encheres = Requester.getInstance().getEncheresByVente(vente.getIdVente());
+            for (Enchere enchere : encheres) {
+                if (enchere.getEmailUtilisateur().equals(emailTextfield.getText())) {
+                    peutEncherir = false;
+                }
+            }
+        }
+
+        if (!peutEncherir) {
+            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "Vous ne pouvez plus enchérir sur cet objet");
+            enchereVenteStage.close();
+            return;
+        }
+
         Utilisateur utilisateur = new Utilisateur(emailTextfield.getText(), nomTextfield.getText(), prenomTextfield.getText(), adresseTextField.getText());
         Requester.getInstance().upsertUtilisateur(utilisateur);
         Enchere enchere = new Enchere(

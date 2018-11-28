@@ -6,14 +6,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Label layoutX="79.0" layoutY="75.0" prefHeight="29.0" prefWidth="68.0" text="Prix final" />
-      <Label layoutX="193.0" layoutY="82.0" text="Produit" />
-      <Label layoutX="314.0" layoutY="82.0" prefHeight="15.0" prefWidth="68.0" text="Gagnant" />
-      <Label fx:id="prixFinalLabel" layoutX="79.0" layoutY="125.0" text="Label" />
-      <Label fx:id="nomProduitLabel" layoutX="199.0" layoutY="125.0" text="Label" />
-      <Label fx:id="fullnameGagnantLabel" layoutX="330.0" layoutY="125.0" text="Label" />
-   </children>
+    <children>
+        <Label layoutX="182.0" layoutY="25.0" text="Produit" />
+        <TableView fx:id="gagnantsTableView" layoutX="1.0" layoutY="63.0" prefHeight="303.0" prefWidth="592.0">
+            <columns>
+                <TableColumn fx:id="emailGagnantColumn" prefWidth="207.0" text="Nom" />
+                <TableColumn fx:id="prixProposeColumn" prefWidth="120.0" text="Prix achat" />
+                <TableColumn fx:id="quantProposeeColumn" prefWidth="136.0" text="Quantité achetée" />
+            <TableColumn fx:id="prixTotalColumn" prefWidth="136.0" text="Total" />
+            </columns>
+        </TableView>
+      <Label fx:id="nomProduitLabel" layoutX="277.0" layoutY="25.0" text="Produit" />
+    </children>
 </AnchorPane>
