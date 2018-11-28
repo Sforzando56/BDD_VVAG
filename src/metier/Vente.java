@@ -47,6 +47,9 @@ public class Vente {
         return getProduit().nomProperty();
     }
 
+    public void setFin(Timestamp fin) {
+        this.fin = fin;
+    }
 
     public void setIdSalle(int idSalle) {
         this.idSalle = idSalle;

@@ -6,29 +6,24 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EnchereVenteController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button onMouseClicked="onEncherit" layoutX="264.0" layoutY="343.0" mnemonicParsing="false" text="Enchérir"/>
-        <Label layoutX="53.0" layoutY="35.0" text="Prix en Cours"/>
-        <Label layoutX="212.0" layoutY="35.0" text="Produit"/>
-        <Label layoutX="337.0" layoutY="35.0" text="Vendeur"/>
-        <Label layoutX="461.0" layoutY="35.0" text="Fin"/>
-        <Label fx:id="prixEnCoursLabel" layoutX="69.0" layoutY="69.0" text="Label"/>
-        <Label fx:id="nomProduitLabel" layoutX="218.0" layoutY="69.0" text="Label"/>
-        <Label fx:id="fullnameVendeurLabel" layoutX="347.0" layoutY="69.0" text="Label"/>
-        <Label fx:id="finLabel" layoutX="453.0" layoutY="69.0" text="Label"/>
-        <TextField fx:id="emailTextfield" layoutX="20.0" layoutY="159.0" prefHeight="25.0" prefWidth="94.0"
-                   promptText="email"/>
-        <TextField fx:id="prenomTextfield" layoutX="159.0" layoutY="159.0" prefHeight="25.0" prefWidth="115.0"
-                   promptText="prenom"/>
-        <TextField fx:id="nomTextfield" layoutX="326.0" layoutY="159.0" prefHeight="25.0" prefWidth="122.0"
-                   promptText="nom"/>
-        <TextField fx:id="adresseTextField" layoutX="29.0" layoutY="212.0" promptText="adresse"/>
-        <Label layoutX="527.0" layoutY="35.0" text="Stock"/>
-        <Label fx:id="stockLabel" layoutX="533.0" layoutY="69.0" text="Label"/>
-        <TextField fx:id="quantProposeeTextfield" layoutX="241.0" layoutY="212.0" promptText="Quantité proposée"/>
-        <TextField fx:id="prixAchatTextfield" layoutX="221.0" layoutY="253.0" promptText="Prix proposé"/>
+        <Button layoutX="264.0" layoutY="343.0" mnemonicParsing="false" onAction="#onEncherit" text="Enchérir" />
+        <Label layoutX="24.0" layoutY="35.0" text="Prix en Cours" />
+        <Label layoutX="159.0" layoutY="35.0" text="Produit" />
+        <Label layoutX="247.0" layoutY="35.0" text="Vendeur" />
+        <Label layoutX="354.0" layoutY="35.0" text="Fin" />
+        <Label fx:id="prixEnCoursLabel" layoutX="32.0" layoutY="69.0" text="Label" />
+        <Label fx:id="nomProduitLabel" layoutX="165.0" layoutY="69.0" text="Label" />
+        <Label fx:id="fullnameVendeurLabel" layoutX="256.0" layoutY="69.0" text="Label" />
+        <Label fx:id="finLabel" layoutX="346.0" layoutY="69.0" text="Label" />
+        <TextField fx:id="emailTextfield" layoutX="20.0" layoutY="159.0" prefHeight="25.0" prefWidth="94.0" promptText="email" />
+        <TextField fx:id="prenomTextfield" layoutX="159.0" layoutY="159.0" prefHeight="25.0" prefWidth="115.0" promptText="prenom" />
+        <TextField fx:id="nomTextfield" layoutX="326.0" layoutY="159.0" prefHeight="25.0" prefWidth="122.0" promptText="nom" />
+        <TextField fx:id="adresseTextField" layoutX="29.0" layoutY="212.0" promptText="adresse" />
+        <Label layoutX="527.0" layoutY="35.0" text="Stock" />
+        <Label fx:id="stockLabel" layoutX="533.0" layoutY="69.0" text="Label" />
+        <TextField fx:id="quantProposeeTextfield" layoutX="241.0" layoutY="212.0" promptText="Quantité proposée" />
+        <TextField fx:id="prixAchatTextfield" layoutX="221.0" layoutY="253.0" promptText="Prix proposé" />
     </children>
 </AnchorPane>

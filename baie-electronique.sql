@@ -1,5 +1,4 @@
 DROP TABLE CategorieProduit PURGE;
-DROP TABLE CaracteristiqueProduit PURGE;
 DROP TABLE Enchere PURGE;
 DROP TABLE Vente PURGE;
 DROP TABLE Caracteristique PURGE;
@@ -37,6 +36,7 @@ CREATE TABLE Produit(
   prix_revient NUMERIC(10, 2),
   stock INT NOT NULL CHECK(stock >= 0),
   email_utilisateur VARCHAR2(30),
+  nom VARCHAR2(30),
   FOREIGN KEY(email_utilisateur) REFERENCES Utilisateur (email)
 );
 
@@ -71,6 +71,8 @@ CREATE TABLE Enchere(
   date_enchere TIMESTAMP NOT NULL,
   email_utilisateur VARCHAR2(30),
   id_vente INT,
+  prix_achat NUMERIC(10,2) NOT NULL,
+  quant_proposee INT NOT NULL,
   FOREIGN KEY (email_utilisateur) REFERENCES Utilisateur (email),
   FOREIGN KEY(id_vente) REFERENCES Vente (id_vente)
 );
