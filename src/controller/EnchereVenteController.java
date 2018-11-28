@@ -125,7 +125,7 @@ public class EnchereVenteController implements Initializable {
             error = true;
         }
 
-        if (Integer.parseInt(quantProposeeTextfield.getText()) <= vente.getProduit().getStock() || Integer.parseInt(quantProposeeTextfield.getText()) <= 0) {
+        if (Integer.parseInt(quantProposeeTextfield.getText()) > vente.getProduit().getStock() || Integer.parseInt(quantProposeeTextfield.getText()) <= 0) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "La quant ne peut dépasser le stock et > 0");
             error = true;
         }
@@ -155,7 +155,9 @@ public class EnchereVenteController implements Initializable {
             vente.setFin(Timestamp.from(instant));
             Requester.getInstance().updateDateVente(vente);
         }
-        Requester.getInstance().insertEnchere(enchere);
+        if(!Requester.getInstance().insertEnchere(enchere, vente.getProduit())) {
+			showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur date", "Date de fin dépassé");
+        }
         enchereVenteStage.close();
         showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Enchere Confirmee");
         enchereVenteStage.close();

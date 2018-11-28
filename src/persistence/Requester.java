@@ -1,11 +1,15 @@
 package persistence;
 
+import static javafx.application.Platform.exit;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,8 +19,6 @@ import metier.Produit;
 import metier.SalleVente;
 import metier.Utilisateur;
 import metier.Vente;
-
-import static javafx.application.Platform.exit;
 
 public class Requester {
 
@@ -75,23 +77,55 @@ public class Requester {
         return salles;
     }
 
-    public void insertEnchere(Enchere enchere) {
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (PRIX_ACHAT, QUANT_PROPOSEE, DATE_ENCHERE, EMAIL_UTILISATEUR, ID_VENTE)"
-                + " VALUES "
-                + "(?, ?, ?, ?, ?)")) {
-            stmt.setDouble(1, enchere.getPrixAchat());
-            stmt.setInt(2, enchere.getQuantProposee());
-            stmt.setTimestamp(3, enchere.getDateEnchere());
-            stmt.setString(4, enchere.getEmailUtilisateur());
-            stmt.setInt(5, enchere.getIdVente());
+    public boolean insertEnchere(Enchere enchere, Produit produit) {
+    	try {
+			BddConnection.getConnection().setAutoCommit(false);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+    	Vente v = getVente(enchere.getIdVente(), produit);
 
-            stmt.executeQuery();
+        Timestamp now = Timestamp.from(Instant.now());
+        if (now.compareTo(v.getFin()) < 0){
+			try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (PRIX_ACHAT, QUANT_PROPOSEE, DATE_ENCHERE, EMAIL_UTILISATEUR, ID_VENTE)"
+					+ " VALUES "
+					+ "(?, ?, ?, ?, ?)")) {
+				stmt.setDouble(1, enchere.getPrixAchat());
+				stmt.setInt(2, enchere.getQuantProposee());
+				stmt.setTimestamp(3, enchere.getDateEnchere());
+				stmt.setString(4, enchere.getEmailUtilisateur());
+				stmt.setInt(5, enchere.getIdVente());
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-            //Enchere déjà dans la base, on pourrait update
-        } catch (SQLException e) {
-            e.printStackTrace();
+				stmt.executeQuery();
+
+				BddConnection.getConnection().commit();
+				try {
+					BddConnection.getConnection().setAutoCommit(true);
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				return true;
+			} catch (SQLIntegrityConstraintViolationException e) {
+				//Enchere déjà dans la base, on pourrait update
+				try {
+					BddConnection.getConnection().rollback();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			} catch (SQLException e) {
+				try {
+					BddConnection.getConnection().rollback();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
         }
+		try {
+			BddConnection.getConnection().setAutoCommit(true);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+        return false;
     }
 
     public ObservableList<Enchere> getEncheresByVente(int idVente) {
@@ -254,6 +288,25 @@ public class Requester {
         }
     }
 
+    public Vente getVente(int idVente, Produit produit) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Vente WHERE id_vente = ?")) {
+            stmt.setInt(1, idVente);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Vente(idVente, rs.getFloat("prix_dep"), rs.getTimestamp("date_fin"), produit, rs.getInt("id_salle"));
+            } else {
+                System.out.println("Erreur requete get vente");
+                exit();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return null;
+    }
+    
     public Enchere getDerniereEnchere(int idVente) {
         String selectSallesSQL = "SELECT * from Enchere E, Vente V " +
                 "WHERE V.id_vente = " + idVente + " AND E.id_vente = V.id_vente AND ROWNUM = 1 ORDER BY E.date_enchere DESC ";

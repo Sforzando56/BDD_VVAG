@@ -115,6 +115,7 @@ public class FXMLDocumentController implements Initializable {
         }
         Vente vente = ventesTables.getSelectionModel().getSelectedItem();
         Enchere derniereEnchere = requester.getDerniereEnchere(vente.getIdVente());
+        vente = requester.getInstance().getVente(vente.getIdVente(), vente.getProduit());
         Timestamp now = Timestamp.from(Instant.now());
         if (now.compareTo(vente.getFin()) > 0){
             afficheVenteFinie(vente, derniereEnchere);
