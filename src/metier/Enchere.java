@@ -61,4 +61,12 @@ public class Enchere {
 	public StringProperty emailUtilisateurProperty() {
 		return emailUtilisateur;
 	}
+
+	public void setQuantProposee(int quantProposee) {
+		this.quantProposee.set(quantProposee);
+	}
+
+	public FloatProperty prixTotalProperty(){
+    	return new SimpleFloatProperty(quantProposee.get() * prixAchat.get());
+	}
 }

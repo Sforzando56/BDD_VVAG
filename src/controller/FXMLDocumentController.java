@@ -117,7 +117,7 @@ public class FXMLDocumentController implements Initializable {
         Enchere derniereEnchere = requester.getDerniereEnchere(vente.getIdVente());
         Timestamp now = Timestamp.from(Instant.now());
         if (now.compareTo(vente.getFin()) > 0){
-            afficheVenteFinie(vente, derniereEnchere);
+            afficheVenteFinie(vente);
         }
         else {
             afficheVenteEnCours(vente, derniereEnchere);
@@ -143,11 +143,11 @@ public class FXMLDocumentController implements Initializable {
         enchereVenteStage.show();
     }
 
-    private void afficheVenteFinie(Vente vente, Enchere enchere){
+    private void afficheVenteFinie(Vente vente){
         venteFinieStage = new Stage();
         venteFinieStage.setTitle("Enchérir sur vente");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/VenteFinie.fxml"));
-        VenteFinieController enchereVenteController = new VenteFinieController(vente, enchere);
+        VenteFinieController enchereVenteController = new VenteFinieController(vente, salleSelec);
         loader.setController(enchereVenteController);
         Parent root;
         try {

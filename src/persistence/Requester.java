@@ -102,7 +102,7 @@ public class Requester {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                encheres.add(new Enchere(rs.getInt("id_enchere"), rs.getInt("id_vente"), (float) rs.getDouble("prixAchat"), rs.getTimestamp("date_enchere"), rs.getInt("quantProposee"), rs.getString("email_utilisateur")));
+                encheres.add(new Enchere(rs.getInt("id_enchere"), rs.getInt("id_vente"), (float) rs.getDouble("prix_achat"), rs.getTimestamp("date_enchere"), rs.getInt("quant_proposee"), rs.getString("email_utilisateur")));
             }
 
         } catch (SQLException e) {
@@ -205,7 +205,7 @@ public class Requester {
         }
     }
 
-    public void updateDateVente(Vente vente){
+    public void updateDateVente(Vente vente) {
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("UPDATE Vente set "
                 + "DATE_FIN = ? WHERE id_vente = ?")) {
             stmt.setTimestamp(1, vente.getFin());

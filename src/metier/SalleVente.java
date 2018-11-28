@@ -58,6 +58,6 @@ public class SalleVente {
         if (att){
             return aff;
         }
-        return "Non " + aff;
+        return " Non " + aff;
     }
 }
