@@ -43,11 +43,6 @@ public class MenuUtilisateurController implements Initializable {
     @FXML
     private TableColumn<Vente, Date> dateColumn;
 
-    private Stage ajoutVenteStage;
-
-    private Stage enchereVenteStage;
-
-    private Stage venteFinieStage;
 
     private Requester requester;
 
@@ -88,7 +83,7 @@ public class MenuUtilisateurController implements Initializable {
 
     @FXML
     private void onAjouterVente() {
-        ajoutVenteStage = new Stage();
+        Stage ajoutVenteStage = new Stage();
         ajoutVenteStage.setTitle("Ajouter une vente");
         FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutProduit.fxml"));
         AjoutProduitController controller = new AjoutProduitController( ajoutVenteStage);
@@ -112,22 +107,21 @@ public class MenuUtilisateurController implements Initializable {
             return;
         }
         Vente vente = ventesTables.getSelectionModel().getSelectedItem();
-        Enchere derniereEnchere = requester.getDerniereEnchere(vente.getIdVente());
-        vente = requester.getInstance().getVente(vente.getIdVente(), vente.getProduit());
+        vente = requester.getVente(vente.getIdVente(), vente.getProduit());
         Timestamp now = Timestamp.from(Instant.now());
         if (now.compareTo(vente.getFin()) > 0){
             afficheVenteFinie(vente);
         }
         else {
-            afficheVenteEnCours(vente, derniereEnchere);
+            afficheVenteEnCours(vente);
         }
     }
 
-    private void afficheVenteEnCours(Vente vente, Enchere enchere){
-        enchereVenteStage = new Stage();
+    private void afficheVenteEnCours(Vente vente){
+        Stage enchereVenteStage = new Stage();
         enchereVenteStage.setTitle("Enchérir sur vente");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/EnchereVente.fxml"));
-        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, enchere, salleSelec);
+        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, salleSelec);
         loader.setController(enchereVenteController);
         Parent root;
         try {
@@ -143,11 +137,11 @@ public class MenuUtilisateurController implements Initializable {
     }
 
     private void afficheVenteFinie(Vente vente){
-        venteFinieStage = new Stage();
-        venteFinieStage.setTitle("Enchérir sur vente");
+        Stage venteFinieStage = new Stage();
+        venteFinieStage.setTitle("Bilan vente");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/VenteFinie.fxml"));
-        VenteFinieController enchereVenteController = new VenteFinieController(vente, salleSelec);
-        loader.setController(enchereVenteController);
+        VenteFinieController venteFinieController = new VenteFinieController(vente, salleSelec);
+        loader.setController(venteFinieController);
         Parent root;
         try {
             root = loader.load();

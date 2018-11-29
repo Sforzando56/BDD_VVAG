@@ -44,6 +44,9 @@ public class AjoutSalleController {
     TextField categorieTextfield;
 
     @FXML
+    TextField heureTextfield;
+
+    @FXML
     TextArea descriptionCategorieTextArea;
 
 
@@ -79,9 +82,26 @@ public class AjoutSalleController {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez la date de fin puisque duree limitée est sélectionné");
             error = true;
         }
+        if (dureeLimitee.isSelected() && heureTextfield.getText().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez heure de fin puisque duree limitée est sélectionné");
+            error = true;
+        }
         return error;
     }
 
+    private Integer[] parseHeureFin(String heureFin){
+        String tabh[] = heureFin.split(":");
+        if (tabh.length != 2){
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Mauvais format heure fin");
+            return null;
+        }
+        if(!StringUtils.isNumeric(tabh[0]) || !StringUtils.isNumeric(tabh[1]) || tabh[0].length() != 2 || tabh[1].length() != 2){
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Mauvais format heure fin");
+            return null;
+        }
+        Integer tabfin[] = {Integer.parseInt(tabh[0]), Integer.parseInt(tabh[1])};
+        return tabfin;
+    }
 
     @FXML
     public void onAjoutSalle() {
@@ -101,20 +121,24 @@ public class AjoutSalleController {
                 categorie
         );
 
+        Timestamp fin;
+        if (dureeLimitee.isSelected()) {
+            Integer tabh[] = parseHeureFin(heureTextfield.getText());
+            if (tabh == null){
+                return;
+            }
+            fin = Timestamp.valueOf(datePicker.getValue().atTime(tabh[0], tabh[1]));
+        } else {
+            Instant instant = Instant.now();
+            instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
+            fin = Timestamp.from(instant);
+        }
         int idSalle;
         try {
             idSalle = Requester.getInstance().insertSalle(salleVente);
         } catch (Exception e) {
             e.printStackTrace();
             return;
-        }
-        Timestamp fin;
-        if (dureeLimitee.isSelected()) {
-            fin = Timestamp.valueOf(datePicker.getValue().atTime(0, 0));
-        } else {
-            Instant instant = Instant.now();
-            instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
-            fin = Timestamp.from(instant);
         }
         for (Produit produit : produits) {
             Requester.getInstance().insertCategorieProduit(categorie, produit);
@@ -127,8 +151,8 @@ public class AjoutSalleController {
             );
             Requester.getInstance().insertVente(vente);
         }
-        showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Salle ajoutée");
         menuAdminController.updateList();
         ajoutSalleStage.close();
+        showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Salle ajoutée");
     }
 }

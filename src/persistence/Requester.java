@@ -78,60 +78,60 @@ public class Requester {
     }
 
     public boolean insertEnchere(Enchere enchere, Produit produit) {
-    	try {
-			BddConnection.getConnection().setAutoCommit(false);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-    	Vente v = getVente(enchere.getIdVente(), produit);
+        try {
+            BddConnection.getConnection().setAutoCommit(false);
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+        Vente v = getVente(enchere.getIdVente(), produit);
 
         Timestamp now = Timestamp.from(Instant.now());
-        if (now.compareTo(v.getFin()) < 0){
-			try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (PRIX_ACHAT, QUANT_PROPOSEE, DATE_ENCHERE, EMAIL_UTILISATEUR, ID_VENTE)"
-					+ " VALUES "
-					+ "(?, ?, ?, ?, ?)")) {
-				stmt.setDouble(1, enchere.getPrixAchat());
-				stmt.setInt(2, enchere.getQuantProposee());
-				stmt.setTimestamp(3, enchere.getDateEnchere());
-				stmt.setString(4, enchere.getEmailUtilisateur());
-				stmt.setInt(5, enchere.getIdVente());
+        if (now.compareTo(v.getFin()) < 0) {
+            try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO ENCHERE (PRIX_ACHAT, QUANT_PROPOSEE, DATE_ENCHERE, EMAIL_UTILISATEUR, ID_VENTE)"
+                    + " VALUES "
+                    + "(?, ?, ?, ?, ?)")) {
+                stmt.setDouble(1, enchere.getPrixAchat());
+                stmt.setInt(2, enchere.getQuantProposee());
+                stmt.setTimestamp(3, enchere.getDateEnchere());
+                stmt.setString(4, enchere.getEmailUtilisateur());
+                stmt.setInt(5, enchere.getIdVente());
 
-				stmt.executeQuery();
+                stmt.executeQuery();
 
-				BddConnection.getConnection().commit();
-				try {
-					BddConnection.getConnection().setAutoCommit(true);
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-				return true;
-			} catch (SQLIntegrityConstraintViolationException e) {
-				//Enchere déjà dans la base, on pourrait update
-				try {
-					BddConnection.getConnection().rollback();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-			} catch (SQLException e) {
-				try {
-					BddConnection.getConnection().rollback();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-			}
+                BddConnection.getConnection().commit();
+                try {
+                    BddConnection.getConnection().setAutoCommit(true);
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                return true;
+            } catch (SQLIntegrityConstraintViolationException e) {
+                //Enchere déjà dans la base, on pourrait update
+                try {
+                    BddConnection.getConnection().rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            } catch (SQLException e) {
+                try {
+                    BddConnection.getConnection().rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
-		try {
-			BddConnection.getConnection().setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+        try {
+            BddConnection.getConnection().setAutoCommit(true);
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
         return false;
     }
 
-    public ObservableList<Enchere> getEncheresByVente(int idVente) {
+    public ObservableList<Enchere> getEncheresOrdreByVente(int idVente) {
         ObservableList<Enchere> encheres = FXCollections.observableArrayList();
 
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Enchere WHERE id_vente = ?")) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Enchere WHERE id_vente = ? ORDER BY ENCHERE.DATE_ENCHERE DESC")) {
             stmt.setInt(1, idVente);
 
             ResultSet rs = stmt.executeQuery();
@@ -292,16 +292,14 @@ public class Requester {
         }
         return null;
     }
-    
+
     public Enchere getDerniereEnchere(int idVente) {
-        String selectSallesSQL = "SELECT * from Enchere E, Vente V " +
-                "WHERE V.id_vente = " + idVente + " AND E.id_vente = V.id_vente AND ROWNUM = 1 ORDER BY E.date_enchere DESC ";
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT ID_ENCHERE, PRIX_ACHAT, DATE_ENCHERE, QUANT_PROPOSEE, EMAIL_UTILISATEUR " +
+                "from (SELECT * FROM Enchere E, Vente V " +
+                "WHERE V.id_vente = ? AND E.id_vente = V.id_vente ORDER BY E.date_enchere DESC)  WHERE ROWNUM = 1")) {
+            stmt.setInt(1, idVente);
 
-        try {
-            Connection dbConnection = BddConnection.getConnection();
-            Statement statement = dbConnection.createStatement();
-
-            ResultSet rs = statement.executeQuery(selectSallesSQL);
+            ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new Enchere(
                         rs.getInt("id_enchere"), idVente,
@@ -321,46 +319,8 @@ public class Requester {
         return null;
     }
 
-    public Utilisateur getUtilisateur(String emailUtilisateur) {
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Utilisateur WHERE email = ?")) {
-            stmt.setString(1, emailUtilisateur);
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Utilisateur(emailUtilisateur, rs.getString("nom"), rs.getString("prenom"), rs.getString("adresse"));
-            } else {
-                System.out.println("Erreur requete get utilisateur");
-                exit();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            exit();
-        }
-        return null;
-    }
-
-    public Utilisateur getUtilisateurFromProduit(Produit produit) {
-        try (PreparedStatement stmt = BddConnection.getConnection()
-                .prepareStatement("SELECT * FROM Utilisateur U, Produit P WHERE P.id_produit = ? AND P.email_utilisateur = U.email")) {
-            stmt.setInt(1, produit.getIdProduit());
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Utilisateur(rs.getString("email"), rs.getString("nom"), rs.getString("prenom"), rs.getString("adresse"));
-            } else {
-                System.out.println("Erreur requete get utilisateur");
-                exit();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            exit();
-        }
-        return null;
-    }
-
-    public ObservableList<Produit> getProduitsNonEnVente(){
+    public ObservableList<Produit> getProduitsNonEnVente() {
         ObservableList<Produit> produits = FXCollections.observableArrayList();
 
         try (PreparedStatement stmt = BddConnection.getConnection()
@@ -378,7 +338,7 @@ public class Requester {
         return produits;
     }
 
-    public void insertCategorieProduit(Categorie categorie, Produit produit){
+    public void insertCategorieProduit(Categorie categorie, Produit produit) {
         try (PreparedStatement stmt2 = BddConnection.getConnection().prepareStatement(
                 "INSERT INTO CATEGORIEPRODUIT VALUES (?,?)"
         )) {
