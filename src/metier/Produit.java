@@ -27,6 +27,10 @@ public class Produit {
         this.categories = categories;
     }
 
+    public void setStock(int stock) {
+    	this.stock.set(stock);
+    }
+    
     public void setIdProduit(int idProduit) {
         this.idProduit = idProduit;
     }

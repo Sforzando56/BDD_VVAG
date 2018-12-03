@@ -94,13 +94,27 @@ public class Requester {
                 stmt.setInt(5, enchere.getIdVente());
 
                 stmt.executeQuery();
-
                 if (!dureeLimitee) {
                     Instant instant = Instant.now();
                     instant = instant.plusSeconds(600); //Date de fin est maintenant + 10mn
                     v.setFin(Timestamp.from(instant));
                     Requester.getInstance().updateDateVente(v);
                 }
+
+                SalleVente salle = getSalleVente(v.getIdSalle());
+                if(!salle.isMontante()) {
+					PreparedStatement stmt_update = BddConnection.getConnection().prepareStatement("UPDATE Produit SET stock = ? WHERE id_produit = ?");
+					stmt_update.setInt(1, produit.getStock() - enchere.getQuantProposee());
+					stmt_update.setInt(2, produit.getIdProduit());
+					produit.setStock(produit.getStock() - enchere.getQuantProposee());
+					stmt_update.executeUpdate();
+					if(produit.getStock() == 0) {
+						Instant instant = Instant.now();
+						v.setFin(Timestamp.from(instant));
+						Requester.getInstance().updateDateVente(v);
+					}
+                }
+
 
                 BddConnection.getConnection().commit();
                 return true;
@@ -291,6 +305,45 @@ public class Requester {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public SalleVente getSalleVente(int idSalle) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Salle WHERE id_salle = ?")) {
+            stmt.setInt(1, idSalle);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new SalleVente(idSalle, rs.getBoolean("montante"), rs.getBoolean("revocable"), rs.getBoolean("duree_lim"), rs.getBoolean("enchere_libre"), getCategorie(rs.getString("nom_categorie")));
+            } else {
+                System.out.println("Erreur requete get SalleVente");
+                exit();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return null;
+    }
+    
+    
+    public Categorie getCategorie(String nom) {
+        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Categorie WHERE nom = ?")) {
+            stmt.setString(1, nom);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Categorie(nom, rs.getString("description"));
+            } else {
+                System.out.println("Erreur requete get categorie");
+                exit();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exit();
+        }
+        return null;
     }
 
     public Vente getVenteAvecProduitConnu(int idVente, Produit produit) {
