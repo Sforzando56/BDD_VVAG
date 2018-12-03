@@ -12,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import metier.Enchere;
 import metier.SalleVente;
 import metier.Vente;
 import persistence.Requester;
@@ -76,7 +75,7 @@ public class MenuUtilisateurController implements Initializable {
         update();
     }
 
-    public void update(){
+    private void update(){
         salles = requester.getSallesVentes();
         listViewSalles.setItems(salles);
     }
@@ -107,7 +106,7 @@ public class MenuUtilisateurController implements Initializable {
             return;
         }
         Vente vente = ventesTables.getSelectionModel().getSelectedItem();
-        vente = requester.getVente(vente.getIdVente(), vente.getProduit());
+        vente = requester.getVenteAvecProduitConnu(vente.getIdVente(), vente.getProduit());
         Timestamp now = Timestamp.from(Instant.now());
         if (now.compareTo(vente.getFin()) > 0){
             afficheVenteFinie(vente);

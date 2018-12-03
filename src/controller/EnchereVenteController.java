@@ -161,14 +161,8 @@ public class EnchereVenteController implements Initializable {
                 Integer.parseInt(quantProposeeTextfield.getText()),
                 utilisateur.getEmail()
         );
-        if (!salleVente.isDureeLim()) {
-            Instant instant = Instant.now();
-            instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
-            vente.setFin(Timestamp.from(instant));
-            Requester.getInstance().updateDateVente(vente);
-        }
 
-        if (!Requester.getInstance().insertEnchere(enchere, vente.getProduit())) {
+        if (!Requester.getInstance().insertEnchere(enchere, vente.getProduit(), salleVente.isDureeLim())) {
             enchereVenteStage.close();
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur date", "Date de fin dépassé");
         } else {

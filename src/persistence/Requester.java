@@ -19,6 +19,7 @@ import metier.Produit;
 import metier.SalleVente;
 import metier.Utilisateur;
 import metier.Vente;
+import utils.AlertCreator;
 
 public class Requester {
 
@@ -77,13 +78,9 @@ public class Requester {
         return salles;
     }
 
-    public boolean insertEnchere(Enchere enchere, Produit produit) {
-        try {
-            BddConnection.getConnection().setAutoCommit(false);
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        }
-        Vente v = getVente(enchere.getIdVente(), produit);
+    public boolean insertEnchere(Enchere enchere, Produit produit, boolean dureeLimitee) {
+        BddConnection.setAutoCommitConnexion(false);
+        Vente v = getVenteAvecProduitConnu(enchere.getIdVente(), produit);
 
         Timestamp now = Timestamp.from(Instant.now());
         if (now.compareTo(v.getFin()) < 0) {
@@ -98,20 +95,15 @@ public class Requester {
 
                 stmt.executeQuery();
 
+                if (!dureeLimitee) {
+                    Instant instant = Instant.now();
+                    instant = instant.plusSeconds(600); //Date de fin est maintenant + 10mn
+                    v.setFin(Timestamp.from(instant));
+                    Requester.getInstance().updateDateVente(v);
+                }
+
                 BddConnection.getConnection().commit();
-                try {
-                    BddConnection.getConnection().setAutoCommit(true);
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
                 return true;
-            } catch (SQLIntegrityConstraintViolationException e) {
-                //Enchere déjà dans la base, on pourrait update
-                try {
-                    BddConnection.getConnection().rollback();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
             } catch (SQLException e) {
                 try {
                     BddConnection.getConnection().rollback();
@@ -120,15 +112,11 @@ public class Requester {
                 }
             }
         }
-        try {
-            BddConnection.getConnection().setAutoCommit(true);
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        }
         return false;
     }
 
     public ObservableList<Enchere> getEncheresOrdreByVente(int idVente) {
+        BddConnection.setAutoCommitConnexion(true);
         ObservableList<Enchere> encheres = FXCollections.observableArrayList();
 
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Enchere WHERE id_vente = ? ORDER BY ENCHERE.DATE_ENCHERE DESC")) {
@@ -146,6 +134,7 @@ public class Requester {
     }
 
     public ObservableList<Vente> getVentesBySalle(int idSalle) {
+        BddConnection.setAutoCommitConnexion(true);
         ObservableList<Vente> ventes = FXCollections.observableArrayList();
 
         String selectSallesSQL = "SELECT ID_VENTE, P.ID_PRODUIT, PRIX_DEP, PRIX_REVIENT, DATE_FIN, STOCK, NOM from VENTE V, PRODUIT P " +
@@ -170,6 +159,7 @@ public class Requester {
     }
 
     public void upsertUtilisateur(Utilisateur utilisateur) {
+        BddConnection.setAutoCommitConnexion(true);
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO UTILISATEUR"
                 + " VALUES "
                 + "(?, ?, ?, ?)")) {
@@ -189,6 +179,7 @@ public class Requester {
     }
 
     public void insertProduit(Produit produit, String emailUtilisateur) {
+        BddConnection.setAutoCommitConnexion(true);
         String[] generatedId = {"id_produit"};
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO Produit"
                 + "(nom, prix_revient, stock, email_utilisateur) VALUES "
@@ -210,35 +201,21 @@ public class Requester {
         }
     }
 
-    public void insertVente(Vente vente) {
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO Vente"
-                + "(DATE_FIN, PRIX_DEP, ID_SALLE, ID_PRODUIT) VALUES "
-                + "(?, ?, ?, ?)")) {
-            stmt.setTimestamp(1, vente.getFin());
-            stmt.setFloat(2, vente.getPrixDepart());
-            stmt.setInt(3, vente.getIdSalle());
-            stmt.setInt(4, vente.getProduit().getIdProduit());
 
-            stmt.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void updateDateVente(Vente vente) throws SQLException {
+        PreparedStatement stmt = BddConnection.getConnection().prepareStatement("UPDATE Vente set "
+                + "DATE_FIN = ? WHERE id_vente = ?");
+        stmt.setTimestamp(1, vente.getFin());
+        stmt.setInt(2, vente.getIdVente());
+
+        stmt.executeQuery();
+
     }
 
-    public void updateDateVente(Vente vente) {
-        try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("UPDATE Vente set "
-                + "DATE_FIN = ? WHERE id_vente = ?")) {
-            stmt.setTimestamp(1, vente.getFin());
-            stmt.setInt(2, vente.getIdVente());
-
-            stmt.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public int insertSalle(SalleVente salleVente) throws Exception {
+    public boolean insertSalleEtVentes(SalleVente salleVente, ObservableList<Produit> produits, Timestamp fin, Categorie categorie) {
         String[] generatedId = {"id_salle"};
+        BddConnection.setAutoCommitConnexion(false);
+        int idSalle;
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO SALLE"
                 + "(MONTANTE, DUREE_LIM, REVOCABLE, ENCHERE_LIBRE, NOM_CATEGORIE) VALUES "
                 + "(?, ?, ?, ?, ?)", generatedId)) {
@@ -252,14 +229,56 @@ public class Requester {
             ResultSet rs = stmt.getGeneratedKeys();
 
             if (rs.next()) {
-                return rs.getInt(1);
+                idSalle = rs.getInt(1);
             } else {
-                return -1;
+                return false;
+            }
+
+            for (Produit produit : produits) {
+                Requester.getInstance().insertCategorieProduit(categorie, produit);
+
+                float prixDepart = AlertCreator.shoxDialogPrix(produit.getNom());
+                Vente vente = new Vente(0, prixDepart, fin, produit, idSalle);
+                Requester.getInstance().insertVente(vente);
+            }
+
+            BddConnection.getConnection().commit();
+            return true;
+
+        } catch (SQLException e) {
+            try {
+                BddConnection.getConnection().rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
             }
         }
+        return false;
+    }
+
+    private void insertCategorieProduit(Categorie categorie, Produit produit) throws SQLException {
+        PreparedStatement stmt2 = BddConnection.getConnection().prepareStatement(
+                "INSERT INTO CATEGORIEPRODUIT VALUES (?,?)");
+        stmt2.setString(1, categorie.getNom());
+        stmt2.setInt(2, produit.getIdProduit());
+
+        stmt2.executeQuery();
+
+    }
+
+    private void insertVente(Vente vente) throws SQLException {
+        PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO Vente"
+                + "(DATE_FIN, PRIX_DEP, ID_SALLE, ID_PRODUIT) VALUES "
+                + "(?, ?, ?, ?)");
+        stmt.setTimestamp(1, vente.getFin());
+        stmt.setFloat(2, vente.getPrixDepart());
+        stmt.setInt(3, vente.getIdSalle());
+        stmt.setInt(4, vente.getProduit().getIdProduit());
+
+        stmt.executeQuery();
     }
 
     public void upsertCategorie(Categorie categorie) {
+        BddConnection.setAutoCommitConnexion(true);
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("INSERT INTO CATEGORIE"
                 + " VALUES "
                 + "(?, ?)")) {
@@ -274,7 +293,8 @@ public class Requester {
         }
     }
 
-    public Vente getVente(int idVente, Produit produit) {
+    public Vente getVenteAvecProduitConnu(int idVente, Produit produit) {
+        BddConnection.setAutoCommitConnexion(true);
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT * FROM Vente WHERE id_vente = ?")) {
             stmt.setInt(1, idVente);
 
@@ -294,6 +314,7 @@ public class Requester {
     }
 
     public Enchere getDerniereEnchere(int idVente) {
+        BddConnection.setAutoCommitConnexion(true);
         try (PreparedStatement stmt = BddConnection.getConnection().prepareStatement("SELECT ID_ENCHERE, PRIX_ACHAT, DATE_ENCHERE, QUANT_PROPOSEE, EMAIL_UTILISATEUR " +
                 "from (SELECT * FROM Enchere E, Vente V " +
                 "WHERE V.id_vente = ? AND E.id_vente = V.id_vente ORDER BY E.date_enchere DESC)  WHERE ROWNUM = 1")) {
@@ -324,7 +345,7 @@ public class Requester {
         ObservableList<Produit> produits = FXCollections.observableArrayList();
 
         try (PreparedStatement stmt = BddConnection.getConnection()
-                .prepareStatement("SELECT * FROM Produit P WHERE  P.ID_PRODUIT NOT IN (Select id_produit from VENTE)")) {
+                .prepareStatement("SELECT * FROM Produit WHERE  ID_PRODUIT NOT IN (Select id_produit from VENTE)")) {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -333,21 +354,8 @@ public class Requester {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            exit();
         }
         return produits;
     }
 
-    public void insertCategorieProduit(Categorie categorie, Produit produit) {
-        try (PreparedStatement stmt2 = BddConnection.getConnection().prepareStatement(
-                "INSERT INTO CATEGORIEPRODUIT VALUES (?,?)"
-        )) {
-            stmt2.setString(1, categorie.getNom());
-            stmt2.setInt(2, produit.getIdProduit());
-
-            stmt2.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }

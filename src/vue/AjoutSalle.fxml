@@ -18,7 +18,6 @@
         <RadioButton fx:id="encheresNonLibres" layoutX="311.0" layoutY="67.0" mnemonicParsing="false"
                      text="Enchères non libres"/>
         <RadioButton fx:id="revocable" layoutX="311.0" layoutY="191.0" mnemonicParsing="false" text="Vente révocable"/>
-        <TextField fx:id="prixDepartTextfield" layoutX="47.0" layoutY="251.0" promptText="Prix Depart"/>
         <DatePicker fx:id="datePicker" layoutX="300.0" layoutY="251.0"/>
         <Button layoutX="224.0" layoutY="336.0" mnemonicParsing="false" onAction="#onAjoutSalle" text="Créer Salle"/>
         <TextField fx:id="heureTextfield" layoutX="301.0" layoutY="290.0" promptText="Heure ex : 11:54"/>

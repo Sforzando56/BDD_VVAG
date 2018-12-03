@@ -11,6 +11,7 @@ import metier.SalleVente;
 import metier.Vente;
 import org.apache.commons.lang3.StringUtils;
 import persistence.Requester;
+import utils.AlertCreator;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -36,9 +37,6 @@ public class AjoutSalleController {
 
     @FXML
     RadioButton encheresNonLibres;
-
-    @FXML
-    TextField prixDepartTextfield;
 
     @FXML
     TextField categorieTextfield;
@@ -74,10 +72,6 @@ public class AjoutSalleController {
             error = true;
         }
 
-        if (prixDepartTextfield.getText().isEmpty() || !StringUtils.isNumeric(prixDepartTextfield.getText())) {
-            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez le prix de départ du produit");
-            error = true;
-        }
         if (dureeLimitee.isSelected() && datePicker.getValue() == null) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Entrez la date de fin puisque duree limitée est sélectionné");
             error = true;
@@ -89,13 +83,13 @@ public class AjoutSalleController {
         return error;
     }
 
-    private Integer[] parseHeureFin(String heureFin){
+    private Integer[] parseHeureFin(String heureFin) {
         String tabh[] = heureFin.split(":");
-        if (tabh.length != 2){
+        if (tabh.length != 2) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Mauvais format heure fin");
             return null;
         }
-        if(!StringUtils.isNumeric(tabh[0]) || !StringUtils.isNumeric(tabh[1]) || tabh[0].length() != 2 || tabh[1].length() != 2){
+        if (!StringUtils.isNumeric(tabh[0]) || !StringUtils.isNumeric(tabh[1]) || tabh[0].length() != 2 || tabh[1].length() != 2) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Mauvais format heure fin");
             return null;
         }
@@ -124,7 +118,7 @@ public class AjoutSalleController {
         Timestamp fin;
         if (dureeLimitee.isSelected()) {
             Integer tabh[] = parseHeureFin(heureTextfield.getText());
-            if (tabh == null){
+            if (tabh == null) {
                 return;
             }
             fin = Timestamp.valueOf(datePicker.getValue().atTime(tabh[0], tabh[1]));
@@ -133,23 +127,9 @@ public class AjoutSalleController {
             instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
             fin = Timestamp.from(instant);
         }
-        int idSalle;
-        try {
-            idSalle = Requester.getInstance().insertSalle(salleVente);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        for (Produit produit : produits) {
-            Requester.getInstance().insertCategorieProduit(categorie, produit);
-            Vente vente = new Vente(
-                    0,
-                    Float.parseFloat(prixDepartTextfield.getText()),
-                    fin,
-                    produit,
-                    idSalle
-            );
-            Requester.getInstance().insertVente(vente);
+        boolean insertionReussie = Requester.getInstance().insertSalleEtVentes(salleVente, produits, fin, categorie);
+        if (!insertionReussie) {
+            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "Erreur lors de l'insertion, peut-etre accès concurrent");
         }
         menuAdminController.updateList();
         ajoutSalleStage.close();
