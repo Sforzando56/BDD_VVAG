@@ -120,8 +120,12 @@ public class EnchereVenteController implements Initializable {
         } else {
             prixAComp = vente.getPrixDepart();
         }
-        if (Float.parseFloat(prixAchatTextfield.getText()) <= prixAComp) {
+        if (salleVente.isMontante() && Float.parseFloat(prixAchatTextfield.getText()) <= prixAComp) {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Le prix proposé doit dépasser le prix en cours");
+            error = true;
+        }
+        if(!salleVente.isMontante() && Float.parseFloat(prixAchatTextfield.getText()) > prixAComp) {
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Le prix proposé doit être inférieur où égal au prix en cours");
             error = true;
         }
 
