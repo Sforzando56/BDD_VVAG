@@ -72,12 +72,12 @@ public class MenuUtilisateurController implements Initializable {
                 }
             }
         });
-        update();
-    }
-
-    private void update(){
         salles = requester.getSallesVentes();
         listViewSalles.setItems(salles);
+    }
+
+    public void updateTableView(SalleVente salleVente){
+        ventesTables.setItems(Requester.getInstance().getVentesBySalle(salleVente.getIdSalle()));
     }
 
     @FXML
@@ -120,7 +120,7 @@ public class MenuUtilisateurController implements Initializable {
         Stage enchereVenteStage = new Stage();
         enchereVenteStage.setTitle("Enchérir sur vente");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/vue/EnchereVente.fxml"));
-        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, salleSelec);
+        EnchereVenteController enchereVenteController = new EnchereVenteController(vente, enchereVenteStage, salleSelec, this);
         loader.setController(enchereVenteController);
         Parent root;
         try {

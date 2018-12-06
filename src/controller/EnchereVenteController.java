@@ -66,10 +66,13 @@ public class EnchereVenteController implements Initializable {
 
     private Stage enchereVenteStage;
 
-    EnchereVenteController(Vente vente, Stage stage, SalleVente salleVente) {
+    private MenuUtilisateurController menuUtilisateurController;
+
+    EnchereVenteController(Vente vente, Stage stage, SalleVente salleVente, MenuUtilisateurController menuUtilisateurController) {
         this.vente = vente;
         this.salleVente = salleVente;
         enchereVenteStage = stage;
+        this.menuUtilisateurController = menuUtilisateurController;
     }
 
     @Override
@@ -167,6 +170,7 @@ public class EnchereVenteController implements Initializable {
             showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur date", "Date de fin dépassé");
         } else {
             enchereVenteStage.close();
+            menuUtilisateurController.updateTableView(salleVente);
             showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Enchere Confirmee");
         }
     }
