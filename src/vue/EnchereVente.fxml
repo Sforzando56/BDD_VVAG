@@ -11,12 +11,10 @@
         <Button layoutX="264.0" layoutY="343.0" mnemonicParsing="false" onAction="#onEncherit" text="Enchérir" />
         <Label layoutX="24.0" layoutY="35.0" text="Prix en Cours" />
         <Label layoutX="159.0" layoutY="35.0" text="Produit" />
-        <Label layoutX="247.0" layoutY="35.0" text="Vendeur" />
-        <Label layoutX="354.0" layoutY="35.0" text="Fin" />
+        <Label layoutX="297.0" layoutY="35.0" text="Fin" />
         <Label fx:id="prixEnCoursLabel" layoutX="32.0" layoutY="69.0" text="Label" />
         <Label fx:id="nomProduitLabel" layoutX="165.0" layoutY="69.0" text="Label" />
-        <Label fx:id="fullnameVendeurLabel" layoutX="256.0" layoutY="69.0" text="Label" />
-        <Label fx:id="finLabel" layoutX="346.0" layoutY="69.0" text="Label" />
+        <Label fx:id="finLabel" layoutX="289.0" layoutY="69.0" text="Label" />
         <TextField fx:id="emailTextfield" layoutX="20.0" layoutY="159.0" prefHeight="25.0" prefWidth="94.0" promptText="email" />
         <TextField fx:id="prenomTextfield" layoutX="159.0" layoutY="159.0" prefHeight="25.0" prefWidth="115.0" promptText="prenom" />
         <TextField fx:id="nomTextfield" layoutX="326.0" layoutY="159.0" prefHeight="25.0" prefWidth="122.0" promptText="nom" />

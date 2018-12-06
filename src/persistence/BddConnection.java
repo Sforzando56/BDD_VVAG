@@ -8,7 +8,7 @@ import metier.Utilisateur;
 public class BddConnection {
 	private static Connection con;
 
-	public static Connection getConnection() {
+	static Connection getConnection() {
 		if(con == null) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
@@ -18,5 +18,13 @@ public class BddConnection {
 			}
 		}
 		return con;
+	}
+
+	static void setAutoCommitConnexion(boolean autoCommitConnexioncommit){
+		try {
+			getConnection().setAutoCommit(autoCommitConnexioncommit);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
 	}
 }

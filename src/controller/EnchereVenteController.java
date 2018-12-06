@@ -35,9 +35,6 @@ public class EnchereVenteController implements Initializable {
     Label nomProduitLabel;
 
     @FXML
-    Label fullnameVendeurLabel;
-
-    @FXML
     Label finLabel;
 
     @FXML
@@ -69,17 +66,18 @@ public class EnchereVenteController implements Initializable {
 
     private Stage enchereVenteStage;
 
-    EnchereVenteController(Vente vente, Stage stage, Enchere enchere, SalleVente salleVente) {
+    private MenuUtilisateurController menuUtilisateurController;
+
+    EnchereVenteController(Vente vente, Stage stage, SalleVente salleVente, MenuUtilisateurController menuUtilisateurController) {
         this.vente = vente;
-        this.derniereEnchere = enchere;
         this.salleVente = salleVente;
         enchereVenteStage = stage;
+        this.menuUtilisateurController = menuUtilisateurController;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Utilisateur utilisateur = Requester.getInstance().getUtilisateurFromProduit(vente.getProduit());
-        fullnameVendeurLabel.setText(utilisateur.getPrenom() + " " + utilisateur.getNom());
+        this.derniereEnchere = Requester.getInstance().getDerniereEnchere(vente.getIdVente());
         nomProduitLabel.setText(vente.getProduit().getNom());
         if (derniereEnchere == null) {
             prixEnCoursLabel.setText(String.valueOf(vente.getPrixDepart()));
@@ -123,7 +121,7 @@ public class EnchereVenteController implements Initializable {
             prixAComp = vente.getPrixDepart();
         }
         if (Float.parseFloat(prixAchatTextfield.getText()) <= prixAComp) {
-            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Le prix proposé doit dépassé le prix en cours");
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur formulaire", "Le prix proposé doit dépasser le prix en cours");
             error = true;
         }
 
@@ -136,20 +134,13 @@ public class EnchereVenteController implements Initializable {
 
     @FXML
     public void onEncherit() {
-        Timestamp now = Timestamp.from(Instant.now());
-        if (now.compareTo(vente.getFin()) > 0) {
-            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "La vente est désormais terminée");
-            enchereVenteStage.close();
-            return;
-        }
-
         boolean error = validateFormulaire();
         if (error) {
             return;
         }
         boolean peutEncherir = true;
         if (!salleVente.isEnchereLibre()) {
-            ObservableList<Enchere> encheres = Requester.getInstance().getEncheresByVente(vente.getIdVente());
+            ObservableList<Enchere> encheres = Requester.getInstance().getEncheresOrdreByVente(vente.getIdVente());
             for (Enchere enchere : encheres) {
                 if (enchere.getEmailUtilisateur().equals(emailTextfield.getText())) {
                     peutEncherir = false;
@@ -158,8 +149,8 @@ public class EnchereVenteController implements Initializable {
         }
 
         if (!peutEncherir) {
-            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "Vous ne pouvez plus enchérir sur cet objet");
             enchereVenteStage.close();
+            AlertCreator.showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur", "Vous ne pouvez plus enchérir sur cet objet");
             return;
         }
 
@@ -173,17 +164,14 @@ public class EnchereVenteController implements Initializable {
                 Integer.parseInt(quantProposeeTextfield.getText()),
                 utilisateur.getEmail()
         );
-        if (!salleVente.isDureeLim()) {
-            Instant instant = Instant.now();
-            instant = instant.plusSeconds(600); //Date de fin est maintenant plus 10mn
-            vente.setFin(Timestamp.from(instant));
-            Requester.getInstance().updateDateVente(vente);
+
+        if (!Requester.getInstance().insertEnchere(enchere, vente.getProduit(), salleVente.isDureeLim())) {
+            enchereVenteStage.close();
+            showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur date", "Date de fin dépassé");
+        } else {
+            enchereVenteStage.close();
+            menuUtilisateurController.updateTableView(salleVente);
+            showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Enchere Confirmee");
         }
-        if(!Requester.getInstance().insertEnchere(enchere, vente.getProduit())) {
-			showAlert(Alert.AlertType.ERROR, anchorPane.getScene().getWindow(), "Erreur date", "Date de fin dépassé");
-        }
-        enchereVenteStage.close();
-        showAlert(Alert.AlertType.CONFIRMATION, anchorPane.getScene().getWindow(), "Confirmation", "Enchere Confirmee");
-        enchereVenteStage.close();
     }
 }

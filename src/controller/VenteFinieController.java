@@ -12,19 +12,20 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import metier.Enchere;
 import metier.SalleVente;
-import metier.Utilisateur;
 import metier.Vente;
 import persistence.Requester;
 import utils.AlertCreator;
 
 import java.net.URL;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 public class VenteFinieController implements Initializable {
 
     @FXML
     Label nomProduitLabel;
+
+    @FXML
+    Label etatLabel;
 
     @FXML
     private TableView<Enchere> gagnantsTableView;
@@ -49,7 +50,6 @@ public class VenteFinieController implements Initializable {
     VenteFinieController(Vente vente, SalleVente salleVente) {
         this.vente = vente;
         this.salleVente = salleVente;
-
     }
 
     @Override
@@ -64,27 +64,44 @@ public class VenteFinieController implements Initializable {
     private void afficher() {
         nomProduitLabel.setText(vente.getProduit().getNom());
         ObservableList<Enchere> gagnants = FXCollections.observableArrayList();
-        ObservableList<Enchere> encheres = Requester.getInstance().getEncheresByVente(vente.getIdVente());
+        ObservableList<Enchere> encheres = Requester.getInstance().getEncheresOrdreByVente(vente.getIdVente());
         int stockPropose = 0;
         boolean dejaPresent;
         for (Enchere enchere : encheres) {
             dejaPresent = false;
-            if (enchere.getQuantProposee() + stockPropose > vente.getProduit().getStock()) {
-                int quantPossible = vente.getProduit().getStock() - stockPropose;
-                enchere.setQuantProposee(quantPossible);
-                gagnants.add(enchere);
-                break;
-            }
             for (Enchere enchere1 : gagnants) {
                 if (enchere.getEmailUtilisateur().equals(enchere1.getEmailUtilisateur())) {
                     dejaPresent = true;
                     break;
                 }
             }
-            if (!dejaPresent) {
-                gagnants.add(enchere);
-                stockPropose += enchere.getQuantProposee();
+            if (dejaPresent) {
+                continue;
             }
+            if (enchere.getQuantProposee() + stockPropose > vente.getProduit().getStock()) {
+                int quantPossible = vente.getProduit().getStock() - stockPropose;
+                if (quantPossible > 0) {
+                    enchere.setQuantProposee(quantPossible);
+                    gagnants.add(enchere);
+                }
+                break;
+            }
+            gagnants.add(enchere);
+            stockPropose += enchere.getQuantProposee();
         }
+
+        if (gagnants.isEmpty()) {
+            etatLabel.setText( "Pas d'enchère sur ce produit");
+        }
+        else {
+            etatLabel.setText("Voici le/les gagnant/s");
+        }
+
+        if (salleVente.isRevocable() && !gagnants.isEmpty() && vente.getProduit().getPrixRevient() > gagnants.get(0).getPrixAchat()) {
+            etatLabel.setText("Vente annulée, prix de revient non atteint");
+            return;
+        }
+
+        gagnantsTableView.setItems(gagnants);
     }
 }
