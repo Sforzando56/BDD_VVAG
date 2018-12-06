@@ -7,9 +7,10 @@
 <?import javafx.scene.layout.*?>
 
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuEntreeController">
+<AnchorPane prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MenuEntreeController">
    <children>
-      <Button layoutX="101.0" layoutY="135.0" mnemonicParsing="false" onAction="#onAdminChoice" text="Admin" />
-      <Button layoutX="330.0" layoutY="135.0" mnemonicParsing="false" onAction="#onUtilisateurChoice" text="Utilisateur" />
+      <Button layoutX="101.0" layoutY="135.0" mnemonicParsing="false" onAction="#onAdminChoice" text="Gérer les salles" />
+      <Button layoutX="330.0" layoutY="135.0" mnemonicParsing="false" onAction="#onUtilisateurChoice" text="Faire une enchère" />
+      <Button  layoutX="560.0" layoutY="135.0" mnemonicParsing="false" onAction="#onAjouterVente" text="Vendre un produit" />
    </children>
 </AnchorPane>

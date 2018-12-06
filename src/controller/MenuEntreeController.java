@@ -45,4 +45,23 @@ public class MenuEntreeController {
     }
 
 
+    @FXML
+    private void onAjouterVente() {
+        Stage ajoutVenteStage = new Stage();
+        ajoutVenteStage.setTitle("Ajouter une vente");
+        FXMLLoader fxmloader = new FXMLLoader(getClass().getResource("/vue/AjoutProduit.fxml"));
+        AjoutProduitController controller = new AjoutProduitController( ajoutVenteStage);
+        fxmloader.setController(controller);
+        Parent root;
+        try {
+            root = fxmloader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        Scene scene = new Scene(root);
+        ajoutVenteStage.setScene(scene);
+
+        ajoutVenteStage.show();
+    }
 }

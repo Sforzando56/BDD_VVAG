@@ -17,7 +17,4 @@
             </columns>
         </TableView>
     </center>
-   <bottom>
-      <Button mnemonicParsing="false" onAction="#onAjouterVente" text="Vendre un produit" textAlignment="CENTER" BorderPane.alignment="BOTTOM_LEFT" />
-   </bottom>
 </BorderPane>
