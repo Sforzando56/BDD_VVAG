@@ -78,7 +78,8 @@ public class VenteFinieController implements Initializable {
             if (dejaPresent) {
                 continue;
             }
-            if (enchere.getQuantProposee() + stockPropose > vente.getProduit().getStock()) {
+            if (enchere.getQuantProposee() + stockPropose > vente.getProduit().getStock() 
+            		&& salleVente.isMontante()) {
                 int quantPossible = vente.getProduit().getStock() - stockPropose;
                 if (quantPossible > 0) {
                     enchere.setQuantProposee(quantPossible);
