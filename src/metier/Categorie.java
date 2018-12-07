@@ -1,12 +1,7 @@
 package metier;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import persistence.BddConnection;
 
 public class Categorie {
     private StringProperty nom;
